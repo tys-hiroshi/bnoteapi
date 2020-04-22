@@ -1,0 +1,351 @@
+openapi: 3.0.1
+info:
+  description: This is `bsvcontentserver`.
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+  title: OpenAPI BsvContent
+  version: 1.0.0
+servers:
+- url: https://bsvcontent.herokuapp.com/v1
+tags:
+- description: use api in bsvcontent
+  name: api
+paths:
+  /api/add_address:
+    post:
+      description: search data for added address on Bitcoin SV.
+      operationId: api_addaddress
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestAddAddressModel'
+        description: request /api/add_address
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseAddAddressModel'
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid Order
+      security:
+      - api_key: []
+      summary: search data for added address on bitcoin sv
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_addaddress_controller
+  /api/download/{txid}:
+    get:
+      description: get data for transaction id on Bitcoin SV.
+      operationId: api_download
+      parameters:
+      - description: bitcoin sv transaction id
+        explode: true
+        in: path
+        name: txid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            image/png:
+              schema:
+                format: binary
+                type: string
+            image/jpeg:
+              schema:
+                format: binary
+                type: string
+            text/plain:
+              schema:
+                format: binary
+                type: string
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid status value
+      security:
+      - api_key: []
+      summary: get data for transaction id on Bitcoin SV.
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_download_controller
+  /api/mnemonic:
+    post:
+      description: convert mnemonic words to wif, asset on Bitcoin SV.
+      operationId: api_mnemonic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestMnemonicModel'
+        description: request /api/mnemonic
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseMnemonicModel'
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid Order
+      security:
+      - api_key: []
+      summary: convert mnemonic words to wif, asset on Bitcoin SV.
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_mnemonic_controller
+  /api/tx/{addr}:
+    get:
+      description: get transaction from mongodb.
+      operationId: api_tx
+      parameters:
+      - description: bitcoin sv address
+        explode: true
+        in: path
+        name: addr
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: start index ( default is 0 )
+        explode: true
+        in: query
+        name: start_index
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: get transaction count ( default is 5 )
+        explode: true
+        in: query
+        name: count
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ResponseTxModel'
+                type: array
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid status value
+      security:
+      - api_key: []
+      summary: get transactions.
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_tx_controller
+  /api/upload:
+    post:
+      description: convert mnemonic words to wif, asset on Bitcoin SV.
+      operationId: api_upload
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object'
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                privatekey_wif:
+                  type: string
+                file:
+                  format: binary
+                  type: string
+              type: object
+        description: request /api/upload
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUploadModel'
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid Order
+      security:
+      - api_key: []
+      summary: upload file on Bitcoin SV. (100kb)
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_upload_controller
+  /api/upload_text:
+    post:
+      description: upload text data on Bitcoin SV.
+      operationId: api_uploadtext
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestUploadTextModel'
+        description: upload text data on Bitcoin SV.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ResponseUploadTextModel'
+                type: array
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid status value
+      security:
+      - api_key: []
+      summary: upload text data on Bitcoin SV.
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_uploadtext_controller
+components:
+  requestBodies:
+    inline_object:
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/inline_object'
+      required: true
+  schemas:
+    RequestUploadTextModel:
+      description: request /api/upload_text
+      example:
+        mnemonic_words: ""
+        message: upload text
+      properties:
+        mnemonic_words:
+          type: string
+        message:
+          type: string
+      title: request /api/upload_text
+      type: object
+    RequestAddAddressModel:
+      description: request /api/add_address
+      example:
+        address: bitcoin sv address
+      properties:
+        address:
+          type: string
+      title: request /api/add_address
+      type: object
+    ResponseAddAddressModel:
+      description: response /api/add_address
+      example:
+        code: 0
+        message: message
+      properties:
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+      title: response /api/add_address
+      type: object
+    RequestMnemonicModel:
+      description: request /api/mnemonic
+      example:
+        mnemonic: bitcoin sv mnemonic words
+      properties:
+        mnemonic:
+          type: string
+      title: request /api/mnemonic
+      type: object
+    ResponseMnemonicModel:
+      description: response /api/mnemonic
+      example:
+        code: 0
+        privatekey_wif: privatekey
+        address: address
+        balance_satoshi: 100
+      properties:
+        code:
+          format: int32
+          type: integer
+        privatekey_wif:
+          type: string
+        address:
+          type: string
+        balance_satoshi:
+          format: int32
+          type: integer
+      title: response /api/mnemonic
+      type: object
+    ResponseUploadModel:
+      description: response /api/upload
+      example:
+        code: 0
+        txid: transaction id
+      properties:
+        code:
+          format: int32
+          type: integer
+        txid:
+          type: string
+      title: response /api/upload
+      type: object
+    ResponseUploadTextModel:
+      description: response /api/add_address
+      example:
+        code: 0
+        message: message
+      properties:
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+      title: response /api/add_address
+      type: object
+    ResponseTxModel:
+      description: response /api/tx
+      example:
+        code: 0
+        textdata_list:
+        - text00
+        - text01
+      properties:
+        code:
+          format: int32
+          type: integer
+        textdata_list:
+          items:
+            type: string
+          type: array
+      title: response /api/tx
+      type: object
+    inline_object:
+      properties:
+        privatekey_wif:
+          type: string
+        file:
+          format: binary
+          type: string
+      type: object
+  securitySchemes:
+    api_key:
+      in: header
+      name: x-api-key
+      type: apiKey
+      x-apikeyInfoFunc: openapi_server.controllers.security_controller_.info_from_api_key
