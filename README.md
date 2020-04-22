@@ -23,6 +23,7 @@ pip3 install -r requirements.txt
 python3 -m openapi_server
 
 pip3 freeze | grep -v "pkg-resources" > requirements.txt
+heroku logs --tail --app bnoteapi
 ```
 
 ```
