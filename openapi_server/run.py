@@ -2,7 +2,7 @@
 
 import connexion
 
-from . import encoder
+from openapi_server import encoder
 
 #####
 import logging
