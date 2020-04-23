@@ -10,7 +10,7 @@
             "request": "launch",
             "module": "connexion",
             "env": {
-                "FLASK_APP": "./openapi_server/__main__.py",
+                "FLASK_APP": "./openapi_server/run.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
