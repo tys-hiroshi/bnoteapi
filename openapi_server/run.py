@@ -16,6 +16,8 @@ import yaml
 
 def main():
     app = connexion.App(__name__, specification_dir='./openapi_server/openapi/')
+    app.app.config['ENV'] = 'development'
+    app.app.config['TESTING'] = True
     app.app.json_encoder = encoder.JSONEncoder
     app.add_api('openapi.yaml',
                 arguments={'title': 'OpenAPI BsvContent'},
