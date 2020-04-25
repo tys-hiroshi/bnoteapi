@@ -1,1 +1,1 @@
-web: gunicorn --chdir openapi_server openapi_server:app ./openapi_server/openapi/openapi.yaml --log-file=-
+web: connexion run ./openapi_server/openapi/openapi.yaml --port 8080
