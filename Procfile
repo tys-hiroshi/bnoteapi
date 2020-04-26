@@ -1,1 +1,1 @@
-web: gunicorn --chdir openapi_server openapi_server:app -e ENV=development --log-file=-
+web: gunicorn --chdir openapi_server openapi_server:app --log-file=-
