@@ -30,7 +30,7 @@ def main():
     #app.app.config.from_envvar('OPENAPI_FLASK_CONFIG_FILE')
 
 
-    app.run(port=80)
+    app.run(port=8080)
 
 if __name__ == '__main__':
     main()
