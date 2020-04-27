@@ -76,4 +76,10 @@ openapi2postmanv2 -s openapi_server/openapi/openapi.yaml -o postman_collection.j
 ```
 sudo docker build -t bnoteapi:1.0 .
 sudo docker run -p 8080:8080 bnoteapi:1.0
+
+
+heroku create bnote
+heroku stack:set container
+
+heroku logs --tail --app bnoteapi
 ```
