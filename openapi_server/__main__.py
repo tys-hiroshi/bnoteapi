@@ -15,7 +15,7 @@ import yaml
 
 
 def main():
-    app = connexion.App(__name__, specification_dir='./openapi_server/openapi/')
+    app = connexion.App(__name__, specification_dir='./openapi/')
     app.app.env = 'development'
     app.app.config['ENV'] = 'development'
     app.app.config['TESTING'] = True

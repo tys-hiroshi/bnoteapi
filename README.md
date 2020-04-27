@@ -73,3 +73,7 @@ sudo npm install -g openapi-to-postmanv2
 openapi2postmanv2 -s openapi_server/openapi/openapi.yaml -o postman_collection.json -p
 ```
 
+```
+sudo docker build -t bnoteapi:1.0 .
+sudo docker run -p 8080:8080 bnoteapi:1.0
+```
