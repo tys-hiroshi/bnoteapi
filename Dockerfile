@@ -11,5 +11,5 @@ COPY . /usr/src/app
 
 EXPOSE 8080
 
-CMD ["python", "-m", "openapi_server"]
+CMD ["python", "-m", "openapi_server", "--port", "$PORT"]
 
