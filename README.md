@@ -1,4 +1,6 @@
+
 https://bnotev1.herokuapp.com/v1/ui/
+
 https://bnotev1.herokuapp.com/v1/ui is redirect to http://bnotev1.herokuapp.com/v1/ui
 
 # OpenAPI generated server
