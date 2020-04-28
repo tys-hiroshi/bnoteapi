@@ -11,7 +11,7 @@ import yaml
 ## https://github.com/mongodb/mongo-python-driver/commit/62400e548db8e02e82afa77b9014d21e47ed2f7c
 ## query() got an unexpected keyword argument 'lifetime'
 ## pip3 install dnspython==1.16.0
-
+import os
 
 
 def main():
@@ -30,7 +30,7 @@ def main():
     #app.app.config.from_envvar('OPENAPI_FLASK_CONFIG_FILE')
 
 
-    app.run(port=8080)
+    app.run(port=int(os.environ.get('PORT', 8080)))
 
 if __name__ == '__main__':
     main()
