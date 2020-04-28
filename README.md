@@ -83,3 +83,13 @@ heroku stack:set container
 
 heroku logs --tail --app bnoteapi
 ```
+
+it's work
+
+```
+sudo heroku container:login
+sudo heroku create bnotev1
+sudo heroku container:push web
+sudo heroku container:release web
+
+```
