@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/tys-hiroshi/bnoteapi.svg?branch=develop)](https://travis-ci.org/tys-hiroshi/bnoteapi)
 
 https://bnotev1.herokuapp.com/v1/ui/
 
