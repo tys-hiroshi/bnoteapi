@@ -16,4 +16,4 @@ before_script:
   - export FLASK_CONFIG_FILE="$TRAVIS_BUILD_DIR/config.py"
 # command to run tests
 script: 
-  - nosetests --with-coverage
+  - nosetests
