@@ -31,7 +31,7 @@ class TestApiController(BaseTestCase):
         headers = { 
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'api_key': 'special-key',
+            'x-api-key': 'special-key',
         }
         response = self.client.open(
             '/v1/api/add_address',
@@ -49,7 +49,7 @@ class TestApiController(BaseTestCase):
         """
         headers = { 
             'Accept': 'text/plain',
-            'api_key': 'special-key',
+            'x-api-key': 'special-key',
         }
         response = self.client.open(
             '/v1/api/download/{txid}'.format(txid='txid_example'),
@@ -69,7 +69,7 @@ class TestApiController(BaseTestCase):
         headers = { 
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'api_key': 'special-key',
+            'x-api-key': 'special-key',
         }
         response = self.client.open(
             '/v1/api/mnemonic',
@@ -89,7 +89,7 @@ class TestApiController(BaseTestCase):
                         ('count', 56)]
         headers = { 
             'Accept': 'application/json',
-            'api_key': 'special-key',
+            'x-api-key': 'special-key',
         }
         response = self.client.open(
             '/v1/api/tx/{addr}'.format(addr='addr_example'),
@@ -108,7 +108,7 @@ class TestApiController(BaseTestCase):
         headers = { 
             'Accept': 'application/json',
             'Content-Type': 'multipart/form-data',
-            'api_key': 'special-key',
+            'x-api-key': 'special-key',
         }
         data = dict(privatekey_wif='privatekey_wif_example',
                     file=(BytesIO(b'some file data'), 'file.txt'))
@@ -133,7 +133,7 @@ class TestApiController(BaseTestCase):
         headers = { 
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'api_key': 'special-key',
+            'x-api-key': 'special-key',
         }
         response = self.client.open(
             '/v1/api/upload_text',
