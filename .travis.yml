@@ -1,18 +1,19 @@
 # ref: https://docs.travis-ci.com/user/languages/python
 language: python
+sudo: required
 python:
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
 # command to install dependencies
-install: "pip3 install -r requirements.txt"
+install:
+  # - sudo pip3 install nose
+  # - sudo pip3 install coveralls
+  - "pip3 install -r requirements.txt"
 before_script:
   - export FLASK_APP="$TRAVIS_BUILD_DIR/autoapp.py"
   - export FLASK_DEBUG=1
   - export FLASK_CONFIG_FILE="$TRAVIS_BUILD_DIR/config.py"
 # command to run tests
-script: nosetests
+script: 
+  - sudo nosetests --with-coverage
