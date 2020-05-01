@@ -79,24 +79,35 @@ sudo npm install -g openapi-to-postmanv2
 openapi2postmanv2 -s openapi_server/openapi/openapi.yaml -o postman_collection.json -p
 ```
 
+
+
+## run local
+
 ```
 sudo docker build -t bnoteapi:1.0 .
 sudo docker run -p 8080:8080 bnoteapi:1.0
 
 
-heroku create bnote
-heroku stack:set container
-
-heroku logs --tail --app bnoteapi
 ```
 
-it's work
+## deploy heroku - it's work
 
 ```
 sudo heroku container:login
-sudo heroku create bnotev1
+sudo heroku create bnoteapi
+
+sudo heroku git:remote -a bnoteapi
 sudo heroku container:push web
+
 sudo heroku container:release web
 
 nosetests3
+heroku logs --tail --app bnoteapi
+
+```
+
+remove app
+
+```
+sudo heroku apps:destroy --app [app name] --confirm [app name]
 ```
