@@ -7,8 +7,8 @@ info:
   title: OpenAPI BsvContent
   version: 1.0.0
 servers:
-  - url: https://bnoteapi.herokuapp.com/v1
-  - url: https://bnoteapi.herokuapp.com/test/v1
+  - url: /v1
+  - url: /v1/test
 tags:
 - description: use api in bsvcontent
   name: api
