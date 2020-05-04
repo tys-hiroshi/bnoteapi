@@ -24,6 +24,7 @@ def allwed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def api_upload(file=None, privatekey_wif=None):  # noqa: E501
+    privatekey_wif = request.form["privatekey_wif"]
     """upload file on Bitcoin SV. (100kb)
 
     convert mnemonic words to wif, asset on Bitcoin SV. # noqa: E501
