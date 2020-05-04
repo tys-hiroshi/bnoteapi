@@ -52,7 +52,7 @@ def api_mnemonic():  # noqa: E501
             #     balance_satoshi = balance_satoshi,
             #     balance_bsv = balance_bsv,
             #     title="mnemonic")
-        return ResponseMnemonicModel(0, bip39Mnemonic.privatekey_wif, address, balance_satoshi).to_str(), 200
+        return ResponseMnemonicModel(0, bip39Mnemonic.privatekey_wif, address, balance_satoshi).to_dict(), 200
     except Exception as e:
         print(e)
         return {}, 500

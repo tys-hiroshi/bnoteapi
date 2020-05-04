@@ -62,7 +62,7 @@ def api_uploadtext(body):  # noqa: E501
         print("upload txid")
         print(txid)
 
-        return RequestUploadTextModel(0, "success").to_dict(), 200
+        return ResponseUploadTextModel(0, txid).to_dict(), 200
     except Exception as e:
         print(e)
         return {}, 500

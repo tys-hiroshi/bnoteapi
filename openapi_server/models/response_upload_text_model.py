@@ -15,26 +15,26 @@ class ResponseUploadTextModel(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, code=None, message=None):  # noqa: E501
+    def __init__(self, code=None, txid=None):  # noqa: E501
         """ResponseUploadTextModel - a model defined in OpenAPI
 
         :param code: The code of this ResponseUploadTextModel.  # noqa: E501
         :type code: int
-        :param message: The message of this ResponseUploadTextModel.  # noqa: E501
-        :type message: str
+        :param txid: The txid of this ResponseUploadTextModel.  # noqa: E501
+        :type txid: str
         """
         self.openapi_types = {
             'code': int,
-            'message': str
+            'txid': str
         }
 
         self.attribute_map = {
             'code': 'code',
-            'message': 'message'
+            'txid': 'txid'
         }
 
         self._code = code
-        self._message = message
+        self._txid = txid
 
     @classmethod
     def from_dict(cls, dikt) -> 'ResponseUploadTextModel':
@@ -69,22 +69,22 @@ class ResponseUploadTextModel(Model):
         self._code = code
 
     @property
-    def message(self):
-        """Gets the message of this ResponseUploadTextModel.
+    def txid(self):
+        """Gets the txid of this ResponseUploadTextModel.
 
 
-        :return: The message of this ResponseUploadTextModel.
+        :return: The txid of this ResponseUploadTextModel.
         :rtype: str
         """
-        return self._message
+        return self._txid
 
-    @message.setter
-    def message(self, message):
-        """Sets the message of this ResponseUploadTextModel.
+    @txid.setter
+    def txid(self, txid):
+        """Sets the txid of this ResponseUploadTextModel.
 
 
-        :param message: The message of this ResponseUploadTextModel.
-        :type message: str
+        :param txid: The txid of this ResponseUploadTextModel.
+        :type txid: str
         """
 
-        self._message = message
+        self._txid = txid

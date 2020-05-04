@@ -206,9 +206,7 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/ResponseUploadTextModel'
-                type: array
+                $ref: '#/components/schemas/ResponseUploadTextModel'
           description: successful operation
         "400":
           content: {}
@@ -306,17 +304,17 @@ components:
       title: response /api/upload
       type: object
     ResponseUploadTextModel:
-      description: response /api/add_address
+      description: response /api/upload_text
       example:
         code: 0
-        message: message
+        txid: txid
       properties:
         code:
           format: int32
           type: integer
         message:
           type: string
-      title: response /api/add_address
+      title: response /api/upload_text
       type: object
     ResponseTxModel:
       description: response /api/tx
