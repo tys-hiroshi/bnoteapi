@@ -24,7 +24,6 @@ def allwed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def api_upload(file=None, privatekey_wif=None):  # noqa: E501
-    privatekey_wif = request.form["privatekey_wif"]
     """upload file on Bitcoin SV. (100kb)
 
     convert mnemonic words to wif, asset on Bitcoin SV. # noqa: E501
@@ -43,6 +42,7 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
     #     print('ファイルがありません')
     #     return redirect(request.url)
     # データの取り出し
+    privatekey_wif = request.form["privatekey_wif"]
     req_file = file
     stream = req_file.stream
     #img_array = np.asarray(bytearray(stream.read()), dtype=np.uint8)
@@ -57,8 +57,8 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
         # ファイルの保存
         #filepath = os.path.join(app.config['UPLOAD_FOLDER'], req_file.filename)
         #req_file.save(filepath)
-        #privatekey_wif = "cTqvJoYPXAKUuNWre4B53LDSUQNRq8P6vcRHtrTEnrSSNhUynysF"
-        privatekey_wif = request.form["privatekey_wif"]
+        privatekey_wif = "cTqvJoYPXAKUuNWre4B53LDSUQNRq8P6vcRHtrTEnrSSNhUynysF"
+        #privatekey_wif = request.form["privatekey_wif"]
         uploader = polyglot.Upload(privatekey_wif, 'test')
         print(uploader.network)
         req_file_bytearray = bytearray(stream.read())
