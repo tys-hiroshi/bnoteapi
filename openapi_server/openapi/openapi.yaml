@@ -155,6 +155,36 @@ paths:
       - api
       x-codegen-request-body-name: body
       x-openapi-router-controller: openapi_server.controllers.api_tx_controller
+  /api/getbalance/{addr}:
+    get:
+      description: get balance from address using woc.
+      operationId: api_getbalance
+      parameters:
+      - description: bitcoin sv address
+        explode: true
+        in: path
+        name: addr
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseGetBalanceModel'
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid Order
+      security:
+      - api_key: []
+      summary: get balance from address using woc.
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_getbalance_controller
   /api/upload:
     post:
       description: convert mnemonic words to wif, asset on Bitcoin SV.
@@ -289,6 +319,20 @@ components:
           format: int32
           type: integer
       title: response /api/mnemonic
+      type: object
+    ResponseGetBalanceModel:
+      description: response /api/getbalance/{addr}
+      example:
+        confirmed: 26000000
+        unconfirmed: 6000000
+      properties:
+        confirmed:
+          format: int32
+          type: integer
+        unconfirmed:
+          format: int32
+          type: integer
+      title: response /api/getbalance/{addr}
       type: object
     ResponseUploadModel:
       description: response /api/upload
