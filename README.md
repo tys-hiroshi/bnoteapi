@@ -95,7 +95,7 @@ sudo docker run -p 8080:8080 bnoteapi:1.0
 
 ```
 sudo heroku container:login
-sudo heroku create bnoteapi
+#sudo heroku create bnoteapi
 
 sudo heroku git:remote -a bnoteapi
 sudo heroku container:push web
