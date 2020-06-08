@@ -54,6 +54,9 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
         print("req_file.stream:")
         print(req_file.stream)
         app.app.logger.info("req_file.stream:" + req_file.stream)
+        print("privatekey_wif")
+        print(request.form["privatekey_wif"])
+        app.app.logger.info(request.form["privatekey_wif"])
         stream = req_file.stream
         #img_array = np.asarray(bytearray(stream.read()), dtype=np.uint8)
 
