@@ -15,6 +15,8 @@ import polyglot
 
 from flask import request
 
+from openapi_server import app
+
 # アップロードされる拡張子の制限
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif', 'txt'])
 
@@ -43,7 +45,14 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
     #     return redirect(request.url)
     # データの取り出し
     #privatekey_wif = request.form["privatekey_wif"]
+    app.app.logger.info("start /api/upload")
+    print("file:")
+    print(file)
+    app.app.logger.info("file:" + file)
     req_file = file
+    print("req_file.stream:")
+    print(req_file.stream)
+    app.app.logger.info("req_file.stream:" + req_file.stream)
     stream = req_file.stream
     #img_array = np.asarray(bytearray(stream.read()), dtype=np.uint8)
 
