@@ -45,42 +45,47 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
     #     return redirect(request.url)
     # データの取り出し
     #privatekey_wif = request.form["privatekey_wif"]
-    app.app.logger.info("start /api/upload")
-    print("file:")
-    print(file)
-    app.app.logger.info("file:" + file)
-    req_file = file
-    print("req_file.stream:")
-    print(req_file.stream)
-    app.app.logger.info("req_file.stream:" + req_file.stream)
-    stream = req_file.stream
-    #img_array = np.asarray(bytearray(stream.read()), dtype=np.uint8)
+    try:
+        app.app.logger.info("start /api/upload")
+        print("file:")
+        print(file)
+        app.app.logger.info("file:" + file)
+        req_file = file
+        print("req_file.stream:")
+        print(req_file.stream)
+        app.app.logger.info("req_file.stream:" + req_file.stream)
+        stream = req_file.stream
+        #img_array = np.asarray(bytearray(stream.read()), dtype=np.uint8)
 
-    # ファイル名がなかった時の処理
-    if req_file.filename == '':
-        return {}, 400
-    # ファイルのチェック
-    if req_file and allwed_file(req_file.filename):
-        # 危険な文字を削除（サニタイズ処理）
-        #filename = secure_filename(req_file.filename)
-        # ファイルの保存
-        #filepath = os.path.join(app.config['UPLOAD_FOLDER'], req_file.filename)
-        #req_file.save(filepath)
-        #privatekey_wif = "cTqvJoYPXAKUuNWre4B53LDSUQNRq8P6vcRHtrTEnrSSNhUynysF"
-        privatekey_wif = request.form["privatekey_wif"]
-        uploader = polyglot.Upload(privatekey_wif, 'test')
-        #print(uploader.network)
-        req_file_bytearray = bytearray(stream.read())
-        #print(req_file_bytearray)
-        #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
-        media_type = uploader.get_media_type_for_file_name(req_file.filename)
-        encoding = uploader.get_encoding_for_file_name(req_file.filename)
-        #print(media_type)
-        #print(encoding)
-        rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, req_file.filename)
-        txid = uploader.send_rawtx(rawtx)
-        #transaction = uploader.upload_b(filepath)
-        #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
-        #print(txid)
+        # ファイル名がなかった時の処理
+        if req_file.filename == '':
+            return {}, 400
+        # ファイルのチェック
+        if req_file and allwed_file(req_file.filename):
+            # 危険な文字を削除（サニタイズ処理）
+            #filename = secure_filename(req_file.filename)
+            # ファイルの保存
+            #filepath = os.path.join(app.config['UPLOAD_FOLDER'], req_file.filename)
+            #req_file.save(filepath)
+            #privatekey_wif = "cTqvJoYPXAKUuNWre4B53LDSUQNRq8P6vcRHtrTEnrSSNhUynysF"
+            privatekey_wif = request.form["privatekey_wif"]
+            uploader = polyglot.Upload(privatekey_wif, 'test')
+            #print(uploader.network)
+            req_file_bytearray = bytearray(stream.read())
+            #print(req_file_bytearray)
+            #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
+            media_type = uploader.get_media_type_for_file_name(req_file.filename)
+            encoding = uploader.get_encoding_for_file_name(req_file.filename)
+            #print(media_type)
+            #print(encoding)
+            rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, req_file.filename)
+            txid = uploader.send_rawtx(rawtx)
+            #transaction = uploader.upload_b(filepath)
+            #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
+            #print(txid)
 
-        return ResponseUploadModel(0, txid).to_dict(), 200
+            return ResponseUploadModel(0, txid).to_dict(), 200
+    except Exception as e:
+        app.app.logger.info(e)
+        print(e)
+        return {}, 500
