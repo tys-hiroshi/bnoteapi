@@ -18,7 +18,7 @@ from flask import request
 from openapi_server import app
 
 # アップロードされる拡張子の制限
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif', 'txt'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt'])
 
 def allwed_file(filename):
     # .があるかどうかのチェックと、拡張子の確認
