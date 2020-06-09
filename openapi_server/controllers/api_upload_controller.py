@@ -97,6 +97,7 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
         else:
             return ResponseUploadModel(400, "").to_dict(), 400
     except Exception as e:
-        app.app.logger.info(e)
-        print(e)
-        return {e}, 500
+        app.app.logger.error("!!Exception!!")
+        app.app.logger.error(e)
+        #print(e)
+        return e, 500
