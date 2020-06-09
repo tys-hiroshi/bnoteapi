@@ -76,9 +76,9 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
             #privatekey_wif = "cTqvJoYPXAKUuNWre4B53LDSUQNRq8P6vcRHtrTEnrSSNhUynysF"
             privatekey_wif = request.form["privatekey_wif"]
             uploader = polyglot.Upload(privatekey_wif, 'test')
-            #print(uploader.network)
+            app.app.logger.info(uploader.network)
             req_file_bytearray = bytearray(stream.read())
-            #print(req_file_bytearray)
+            app.app.logger.info(len(req_file_bytearray))
             #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
             media_type = uploader.get_media_type_for_file_name(req_file.filename)
             encoding = uploader.get_encoding_for_file_name(req_file.filename)
