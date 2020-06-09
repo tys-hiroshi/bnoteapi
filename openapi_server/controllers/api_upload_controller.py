@@ -32,6 +32,8 @@ def convert_filename_jpeg_to_jpg(filename):
     extension = filename.rsplit('.', 1)[1].lower()
     print("extension")
     print(extension)
+    if extension == "jpeg":
+        extension = "jpg"
     newfilename = f"{basename_without_ext}.{extension}"
     return newfilename
 
