@@ -27,9 +27,13 @@ def allwed_file(filename):
 
 def convert_filename_jpeg_to_jpg(filename):
     basename_without_ext = filename.split('.')[0]
+    print("basename_without_ext")
     print(basename_without_ext)
     extension = filename.rsplit('.', 1)[1].lower()
-    return basename_without_ext + extension
+    print("extension")
+    print(extension)
+    newfilename = f"{basename_without_ext}{extension}"
+    return newfilename
 
 def api_upload(file=None, privatekey_wif=None):  # noqa: E501
     """upload file on Bitcoin SV. (100kb)
