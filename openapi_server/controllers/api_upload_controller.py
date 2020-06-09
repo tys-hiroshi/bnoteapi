@@ -27,7 +27,8 @@ def allwed_file(filename):
 
 def convert_filename_jpeg_to_jpg(filename):
     basename_without_ext = os.path.splitext(os.path.basename(filename))[0]
-    return os.path.join(basename_without_ext, filename.rsplit('.', 1)[1].lower())
+    print(basename_without_ext)
+    return basename_without_ext + filename.rsplit('.', 1)[1].lower()
 
 def api_upload(file=None, privatekey_wif=None):  # noqa: E501
     """upload file on Bitcoin SV. (100kb)
