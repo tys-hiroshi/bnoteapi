@@ -28,7 +28,7 @@ def api_uploadtext(body):  # noqa: E501
         if connexion.request.is_json:
             body = RequestUploadTextModel.from_dict(connexion.request.get_json())  # noqa: E501
         app.app.logger.info("start /api/upload_text")
-        if 'application/json' in connexion.request.headers['Content-Type']:
+        if 'application/json' not in connexion.request.headers['Content-Type']:
             print(connexion.request.headers['Content-Type'])
             return ResponseUploadTextModel(400, "failed").to_dict(), 400
         mnemonic_words = body.mnemonic_words
