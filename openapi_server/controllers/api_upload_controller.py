@@ -85,7 +85,7 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
             txid = uploader.send_rawtx(rawtx)
             #transaction = uploader.upload_b(filepath)
             #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
-            #print(txid)
+            app.app.logger.info("txid:" + txid)
 
             return ResponseUploadModel(0, txid).to_dict(), 200
     except Exception as e:
