@@ -12,7 +12,7 @@ from openapi_server.models.response_upload_text_model import ResponseUploadTextM
 from openapi_server import util
 
 import polyglot
-
+import os
 from flask import request
 
 from openapi_server import app
@@ -24,6 +24,10 @@ def allwed_file(filename):
     # .があるかどうかのチェックと、拡張子の確認
     # OKなら１、だめなら0
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def convert_filename_jpeg_to_jpg(filename):
+    basename_without_ext = os.path.splitext(os.path.basename(filename))[0]
+    return os.path.join(basename_without_ext, filename.rsplit('.', 1)[1].lower())
 
 def api_upload(file=None, privatekey_wif=None):  # noqa: E501
     """upload file on Bitcoin SV. (100kb)
@@ -68,6 +72,7 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
             return {}, 400
         # ファイルのチェック
         if req_file and allwed_file(req_file.filename):
+            filename = convert_filename_jpeg_to_jpg(req_file.filename)
             # 危険な文字を削除（サニタイズ処理）
             #filename = secure_filename(req_file.filename)
             # ファイルの保存
@@ -80,13 +85,13 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
             req_file_bytearray = bytearray(stream.read())
             #app.app.logger.info(len(req_file_bytearray))
             #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
-            media_type = uploader.get_media_type_for_file_name(req_file.filename)
+            media_type = uploader.get_media_type_for_file_name(filename)  ## WARNING: .jpeg is Error!!!!!
             app.app.logger.info(media_type)
-            encoding = uploader.get_encoding_for_file_name(req_file.filename)
+            encoding = uploader.get_encoding_for_file_name(filename)
             app.app.logger.info(encoding)
             #print(media_type)
             #print(encoding)
-            rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, req_file.filename)
+            rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, filename)
             app.app.logger.info(rawtx)
             txid = uploader.send_rawtx(rawtx)
             #transaction = uploader.upload_b(filepath)
