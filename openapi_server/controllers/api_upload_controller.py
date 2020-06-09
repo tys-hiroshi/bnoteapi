@@ -59,7 +59,8 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
         # app.app.logger.info("req_file.stream:" + req_file.stream)
         stream = req_file.stream
         #img_array = np.asarray(bytearray(stream.read()), dtype=np.uint8)
-
+        app.app.logger.info("allwed_file" + allwed_file(req_file.filename))
+        app.app.logger.info("req_file.filename" + req_file.filename)
         # ファイル名がなかった時の処理
         if req_file.filename == '':
             return {}, 400
