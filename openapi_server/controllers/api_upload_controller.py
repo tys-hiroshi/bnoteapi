@@ -78,17 +78,20 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
             uploader = polyglot.Upload(privatekey_wif, 'test')
             app.app.logger.info(uploader.network)
             req_file_bytearray = bytearray(stream.read())
-            app.app.logger.info(len(req_file_bytearray))
+            #app.app.logger.info(len(req_file_bytearray))
             #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
             media_type = uploader.get_media_type_for_file_name(req_file.filename)
+            app.app.logger.info(media_type)
             encoding = uploader.get_encoding_for_file_name(req_file.filename)
+            app.app.logger.info(encoding)
             #print(media_type)
             #print(encoding)
             rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, req_file.filename)
+            app.app.logger.info(rawtx)
             txid = uploader.send_rawtx(rawtx)
             #transaction = uploader.upload_b(filepath)
             #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
-            app.app.logger.info("txid:" + txid)
+            app.app.logger.info(txid)
 
             return ResponseUploadModel(0, txid).to_dict(), 200
         else:
@@ -96,4 +99,4 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
     except Exception as e:
         app.app.logger.info(e)
         print(e)
-        return {}, 500
+        return {e}, 500
