@@ -32,7 +32,7 @@ def convert_filename_jpeg_to_jpg(filename):
     extension = filename.rsplit('.', 1)[1].lower()
     print("extension")
     print(extension)
-    newfilename = f"{basename_without_ext}{extension}"
+    newfilename = f"{basename_without_ext}.{extension}"
     return newfilename
 
 def api_upload(file=None, privatekey_wif=None):  # noqa: E501
