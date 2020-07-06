@@ -17,6 +17,14 @@ from flask import request
 
 from openapi_server import app
 
+from datetime import datetime, timedelta
+from azure.storage.blob import BlobServiceClient, generate_account_sas, ResourceTypes, AccountSasPermissions, ContainerClient, BlobClient
+import asyncio
+
+from openapi_server.utils.Config import Config
+configFile = "app_config.yml"
+
+
 # アップロードされる拡張子の制限
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt'])
 
@@ -37,37 +45,27 @@ def convert_filename_jpeg_to_jpg(filename):
     newfilename = f"{basename_without_ext}.{extension}"
     return newfilename
 
-def api_upload(file=None, privatekey_wif=None):  # noqa: E501
+def api_uploadtocloud(file=None):  # noqa: E501
     """upload file on Bitcoin SV. (100kb)
 
     convert mnemonic words to wif, asset on Bitcoin SV. # noqa: E501
 
-    :param privatekey_wif: 
-    :type privatekey_wif: str
     :param file: 
     :type file: str
 
-    :rtype: ResponseUploadModel
+    :rtype: ResponseUploadToCloudModel
     """
     
-    # # ファイルがなかった場合の処理
-    # if 'file' not in request.files:
-    #     print('ファイルがありません')
-    #     return redirect(request.url)
-    # データの取り出し
-    #privatekey_wif = request.form["privatekey_wif"]
     try:
-        app.app.logger.info("start /api/upload")
+        app.app.logger.info("start /api/uploadtocloud")
+        config = Config(configFile).content
+        ACCOUNT_NAME = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_NAME']
+        ACCOUNT_KEY = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_KEY']
+        CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(ACCOUNT_NAME, ACCOUNT_KEY)
+
+
         req_file = file
-        print("privatekey_wif")
-        # print(request.form["privatekey_wif"])
-        # app.app.logger.info(request.form["privatekey_wif"])
-        # print("file:")
-        # print(file)
-        # app.app.logger.info("file:" + file)
-        # print("req_file.stream:")
-        # print(req_file.stream)
-        # app.app.logger.info("req_file.stream:" + req_file.stream)
+
         stream = req_file.stream
         #img_array = np.asarray(bytearray(stream.read()), dtype=np.uint8)
         app.app.logger.info("allwed_file(req_file.filename)")
@@ -80,30 +78,42 @@ def api_upload(file=None, privatekey_wif=None):  # noqa: E501
         # ファイルのチェック
         if req_file and allwed_file(req_file.filename):
             filename = convert_filename_jpeg_to_jpg(req_file.filename)
+            # 1. divid upload file
+            # 2. get divid file array
+            # 3. generate random index array
+            # 4. divided file array is numbering random index
+            # 5. encrypt generate random index array to string
+            
+            # 6. upload files
+
+            ## 6-1. on blockchain
+            ## 6-2. on cloud
+
+
+            # 7. save No.5 string in server
+
+
             # 危険な文字を削除（サニタイズ処理）
             #filename = secure_filename(req_file.filename)
-            # ファイルの保存
-            #filepath = os.path.join(app.config['UPLOAD_FOLDER'], req_file.filename)
-            #req_file.save(filepath)
-            #privatekey_wif = "cTqvJoYPXAKUuNWre4B53LDSUQNRq8P6vcRHtrTEnrSSNhUynysF"
-            privatekey_wif = request.form["privatekey_wif"]
-            uploader = polyglot.Upload(privatekey_wif, 'test')
-            app.app.logger.info(uploader.network)
-            req_file_bytearray = bytearray(stream.read())
-            #app.app.logger.info(len(req_file_bytearray))
-            #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
-            media_type = uploader.get_media_type_for_file_name(filename)  ## WARNING: .jpeg is Error!!!!!
-            app.app.logger.info(media_type)
-            encoding = uploader.get_encoding_for_file_name(filename)
-            app.app.logger.info(encoding)
-            #print(media_type)
-            #print(encoding)
-            rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, filename)
-            app.app.logger.info(rawtx)
-            txid = uploader.send_rawtx(rawtx)
-            #transaction = uploader.upload_b(filepath)
-            #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
-            app.app.logger.info(txid)
+
+            # privatekey_wif = request.form["privatekey_wif"]
+            # uploader = polyglot.Upload(privatekey_wif, 'test')
+            # app.app.logger.info(uploader.network)
+            # req_file_bytearray = bytearray(stream.read())
+            # #app.app.logger.info(len(req_file_bytearray))
+            # #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
+            # media_type = uploader.get_media_type_for_file_name(filename)  ## WARNING: .jpeg is Error!!!!!
+            # app.app.logger.info(media_type)
+            # encoding = uploader.get_encoding_for_file_name(filename)
+            # app.app.logger.info(encoding)
+            # #print(media_type)
+            # #print(encoding)
+            # rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, filename)
+            # app.app.logger.info(rawtx)
+            # txid = uploader.send_rawtx(rawtx)
+            # #transaction = uploader.upload_b(filepath)
+            # #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
+            # app.app.logger.info(txid)
 
             return ResponseUploadModel(0, txid).to_dict(), 200
         else:
