@@ -22,8 +22,12 @@ from azure.storage.blob import BlobServiceClient, generate_account_sas, Resource
 import asyncio
 
 from openapi_server.utils.Config import Config
-configFile = "app_config.yml"
 
+configFile = "app_config.yml"
+config = Config(configFile).content
+ACCOUNT_NAME = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_NAME']
+ACCOUNT_KEY = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_KEY']
+CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(ACCOUNT_NAME, ACCOUNT_KEY)
 
 # アップロードされる拡張子の制限
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt'])
@@ -57,11 +61,6 @@ def api_uploadtocloud(file=None):  # noqa: E501
     """
     
     try:
-        app.app.logger.info("start /api/uploadtocloud")
-        config = Config(configFile).content
-        ACCOUNT_NAME = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_NAME']
-        ACCOUNT_KEY = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_KEY']
-        CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(ACCOUNT_NAME, ACCOUNT_KEY)
 
 
         req_file = file
@@ -86,7 +85,23 @@ def api_uploadtocloud(file=None):  # noqa: E501
             
             # 6. upload files
 
+            loop = asyncio.get_event_loop()
+            containerName = "containertest"
+            make_container_retry(CONNECTION_STRING, containerName)
+            file_name = "uploadfile01"
+            # Create the BlobServiceClient object which will be used to create a container client
+            blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
+            # Create a blob client using the local file name as the name for the blob
+            blob_client = blob_service_client.get_blob_client(container=containerName, blob=file_name)
+
+            print("\nUploading to Azure Storage as blob:\n\t" + file_name)
+
+            # Upload the created file
+            with open(upload_file_path, "rb") as data:
+                blob_client.upload_blob(data)
+
             ## 6-1. on blockchain
+
             ## 6-2. on cloud
 
 
