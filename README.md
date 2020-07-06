@@ -26,6 +26,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip3 install wheel
 pip3 install whatsonchain
+pip3 install azure-storage-blob
 pip3 install -r requirements.txt
 python3 -m openapi_server
 

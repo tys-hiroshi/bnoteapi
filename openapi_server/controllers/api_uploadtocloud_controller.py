@@ -22,6 +22,7 @@ from azure.storage.blob import BlobServiceClient, generate_account_sas, Resource
 import asyncio
 
 from openapi_server.utils.Config import Config
+from openapi_server.utils.AzureUploader import AzureUploader
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -49,8 +50,8 @@ def convert_filename_jpeg_to_jpg(filename):
     newfilename = f"{basename_without_ext}.{extension}"
     return newfilename
 
-def api_uploadtocloud(file=None):  # noqa: E501
-    """upload file on Bitcoin SV. (100kb)
+def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
+    """upload file on Cloud
 
     convert mnemonic words to wif, asset on Bitcoin SV. # noqa: E501
 
@@ -85,9 +86,10 @@ def api_uploadtocloud(file=None):  # noqa: E501
             
             # 6. upload files
 
-            loop = asyncio.get_event_loop()
+            #loop = asyncio.get_event_loop()
             containerName = "containertest"
-            make_container_retry(CONNECTION_STRING, containerName)
+            azUploader = AzureUploader(CONNECTION_STRING, containerName)
+            azUploader.make_container_retry(CONNECTION_STRING, containerName)
             file_name = "uploadfile01"
             # Create the BlobServiceClient object which will be used to create a container client
             blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
@@ -97,8 +99,7 @@ def api_uploadtocloud(file=None):  # noqa: E501
             print("\nUploading to Azure Storage as blob:\n\t" + file_name)
 
             # Upload the created file
-            with open(upload_file_path, "rb") as data:
-                blob_client.upload_blob(data)
+            blob_client.upload_blob(file)
 
             ## 6-1. on blockchain
 
@@ -129,7 +130,7 @@ def api_uploadtocloud(file=None):  # noqa: E501
             # #transaction = uploader.upload_b(filepath)
             # #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
             # app.app.logger.info(txid)
-
+            txid = -1
             return ResponseUploadModel(0, txid).to_dict(), 200
         else:
             return ResponseUploadModel(400, "").to_dict(), 400

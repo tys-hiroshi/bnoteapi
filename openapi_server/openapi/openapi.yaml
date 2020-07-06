@@ -220,6 +220,40 @@ paths:
       - api
       x-codegen-request-body-name: body
       x-openapi-router-controller: openapi_server.controllers.api_upload_controller
+  /api/uploadtocloud:
+    post:
+      description: convert mnemonic words to wif, asset on Bitcoin SV.
+      operationId: api_uploadtocloud
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                privatekey_wif:
+                  type: string
+                file:
+                  format: binary
+                  type: string
+              type: object
+        description: request /api/upload
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUploadToCloudModel'
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid Order
+      security:
+      - api_key: []
+      summary: upload file on Cloud Storage.
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_uploadtocloud_controller
   /api/upload_text:
     post:
       description: upload text data on Bitcoin SV.
@@ -346,6 +380,19 @@ components:
         txid:
           type: string
       title: response /api/upload
+      type: object
+    ResponseUploadToCloudModel:
+      description: response /api/upload
+      example:
+        code: 0
+        txid: transaction id
+      properties:
+        code:
+          format: int32
+          type: integer
+        txid:
+          type: string
+      title: response /api/uploadtocloud
       type: object
     ResponseUploadTextModel:
       description: response /api/upload_text
