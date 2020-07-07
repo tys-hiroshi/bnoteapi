@@ -24,6 +24,7 @@ import asyncio
 from openapi_server.utils.Config import Config
 from openapi_server.utils.AzureUploader import AzureUploader
 import uuid
+import datetime
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -32,7 +33,7 @@ ACCOUNT_KEY = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_KEY']
 CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(ACCOUNT_NAME, ACCOUNT_KEY)
 
 # アップロードされる拡張子の制限
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt', 'md', 'json', 'yaml', 'yml'])
 
 def allwed_file(filename):
     # .があるかどうかのチェックと、拡張子の確認
@@ -67,8 +68,6 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
     """
     
     try:
-
-
         req_file = file
 
         stream = req_file.stream
@@ -96,7 +95,9 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
             containerName = "containertest"
             azUploader = AzureUploader(CONNECTION_STRING, containerName)
             azUploader.make_container_retry()
-            file_name = "upload{}.{}".format(str(uuid.uuid4()), file_extention) 
+            dt_now = datetime.datetime.now()
+            dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
+            file_name = "upload{}_{}.{}".format(dateTimeNowStr, str(uuid.uuid4().hex), file_extention) 
             # Create the BlobServiceClient object which will be used to create a container client
             blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
             # Create a blob client using the local file name as the name for the blob
