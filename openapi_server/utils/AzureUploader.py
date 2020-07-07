@@ -34,8 +34,8 @@ class AzureUploader(object):
         retryCount = 0
         while retryCount < maxRetryCount:
             retryCount += 1
-            if not is_exist_container(self.connectionString, self.containerName):
-                isSuccess = make_container(self.connectionString, self.containerName)
+            if not self.is_exist_container():
+                isSuccess = self.make_container()
                 if isSuccess:
                     break
 

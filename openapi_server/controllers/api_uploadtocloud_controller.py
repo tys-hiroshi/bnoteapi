@@ -38,6 +38,10 @@ def allwed_file(filename):
     # OKなら１、だめなら0
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+def get_file_extention(filename):
+    return filename.rsplit('.', 1)[1].lower()
+
 def convert_filename_jpeg_to_jpg(filename):
     basename_without_ext = filename.split('.')[0]
     print("basename_without_ext")
@@ -78,6 +82,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
         # ファイルのチェック
         if req_file and allwed_file(req_file.filename):
             filename = convert_filename_jpeg_to_jpg(req_file.filename)
+            file_extention = get_file_extention(filename)
             # 1. divid upload file
             # 2. get divid file array
             # 3. generate random index array
@@ -89,8 +94,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
             #loop = asyncio.get_event_loop()
             containerName = "containertest"
             azUploader = AzureUploader(CONNECTION_STRING, containerName)
-            azUploader.make_container_retry(CONNECTION_STRING, containerName)
-            file_name = "uploadfile01"
+            azUploader.make_container_retry()
+            file_name = "uploadfile01.{}".format(file_extention) 
             # Create the BlobServiceClient object which will be used to create a container client
             blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
             # Create a blob client using the local file name as the name for the blob
