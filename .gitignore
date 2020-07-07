@@ -1,5 +1,10 @@
+.DS_Store
 .bak
 app_config.yml
+test*.jpg.*
+test*.jpg
+partial_test*.jpg
+join_test*.jpg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
