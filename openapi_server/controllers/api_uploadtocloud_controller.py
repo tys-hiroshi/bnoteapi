@@ -23,6 +23,7 @@ import asyncio
 
 from openapi_server.utils.Config import Config
 from openapi_server.utils.AzureUploader import AzureUploader
+import uuid
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -95,7 +96,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
             containerName = "containertest"
             azUploader = AzureUploader(CONNECTION_STRING, containerName)
             azUploader.make_container_retry()
-            file_name = "uploadfile01.{}".format(file_extention) 
+            file_name = "upload{}.{}".format(str(uuid.uuid4()), file_extention) 
             # Create the BlobServiceClient object which will be used to create a container client
             blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
             # Create a blob client using the local file name as the name for the blob
