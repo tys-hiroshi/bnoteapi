@@ -25,6 +25,10 @@ from openapi_server.utils.Config import Config
 from openapi_server.utils.AzureUploader import AzureUploader
 import uuid
 import datetime
+from openapi_server.utils.DivideFile import DivideFile
+from openapi_server.utils.DivideStream import DivideStream
+from openapi_server.utils.GenRandom import GenRandom
+from pprint import pprint
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -85,28 +89,53 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
             file_extention = get_file_extention(filename)
             # 1. divid upload file
             # 2. get divid file array
+            divideStream = DivideStream()
+            chunkSize = 300000
+            # 300000 Byte で分割
+            dividedStreamList = divideStream.divide_stream(stream, chunkSize)
+
             # 3. generate random index array
+            genRandom = GenRandom()
+            random_index_list = genRandom.generate_random_index(len(dividedStreamList))
             # 4. divided file array is numbering random index
+            ## random_index_list の上から順にValue(index)に対応する dividedStreamList のIndexのValueをUploadする
+            containerName = "containertest"
+            azUploader = AzureUploader(CONNECTION_STRING, containerName)
+            azUploader.make_container_retry()
+            dt_now = datetime.datetime.now()
+            # Create the BlobServiceClient object which will be used to create a container client
+            blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
+            uid = str(uuid.uuid4().hex)
+            for i in random_index_list:
+                dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
+                file_name = "upload{}_{}_{}.{}".format(dateTimeNowStr, uid, str(i).zfill(6), file_extention)
+                # Create a blob client using the local file name as the name for the blob
+                blob_client = blob_service_client.get_blob_client(container=containerName, blob=file_name)
+
+                print("\nUploading to Azure Storage as blob:\n\t" + file_name)
+
+                # Upload the created file
+                blob_client.upload_blob(dividedStreamList[i])
             # 5. encrypt generate random index array to string
             
             # 6. upload files
 
             #loop = asyncio.get_event_loop()
-            containerName = "containertest"
-            azUploader = AzureUploader(CONNECTION_STRING, containerName)
-            azUploader.make_container_retry()
-            dt_now = datetime.datetime.now()
-            dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
-            file_name = "upload{}_{}.{}".format(dateTimeNowStr, str(uuid.uuid4().hex), file_extention) 
-            # Create the BlobServiceClient object which will be used to create a container client
-            blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
-            # Create a blob client using the local file name as the name for the blob
-            blob_client = blob_service_client.get_blob_client(container=containerName, blob=file_name)
+            # containerName = "containertest"
+            # azUploader = AzureUploader(CONNECTION_STRING, containerName)
+            # azUploader.make_container_retry()
+            # dt_now = datetime.datetime.now()
+            # dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
+            # file_name = "upload{}_{}.{}".format(dateTimeNowStr, str(uuid.uuid4().hex), file_extention) 
+            # # Create the BlobServiceClient object which will be used to create a container client
+            # blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
+            # # Create a blob client using the local file name as the name for the blob
+            # blob_client = blob_service_client.get_blob_client(container=containerName, blob=file_name)
 
-            print("\nUploading to Azure Storage as blob:\n\t" + file_name)
+            # print("\nUploading to Azure Storage as blob:\n\t" + file_name)
 
-            # Upload the created file
-            blob_client.upload_blob(file)
+            # # Upload the created file
+            # blob_client.upload_blob(file)
 
             ## 6-1. on blockchain
 
