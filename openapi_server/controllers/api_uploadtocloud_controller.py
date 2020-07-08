@@ -90,7 +90,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
             # 1. divid upload file
             # 2. get divid file array
             divideStream = DivideStream()
-            chunkSize = 300000
+            chunkSize = 81
             # 300000 Byte で分割
             dividedStreamList = divideStream.divide_stream(stream, chunkSize)
 
@@ -106,9 +106,10 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
             # Create the BlobServiceClient object which will be used to create a container client
             blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
             uid = str(uuid.uuid4().hex)
+            index = 0
             for i in random_index_list:
                 dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
-                file_name = "upload{}_{}_{}.{}".format(dateTimeNowStr, uid, str(i).zfill(6), file_extention)
+                file_name = "upload{}_{}_{}.{}".format(dateTimeNowStr, uid, str(index).zfill(6), file_extention)
                 # Create a blob client using the local file name as the name for the blob
                 blob_client = blob_service_client.get_blob_client(container=containerName, blob=file_name)
 
@@ -116,6 +117,9 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
 
                 # Upload the created file
                 blob_client.upload_blob(dividedStreamList[i])
+                index += 1
+            
+            ## when divided teststring.txt, 
             # 5. encrypt generate random index array to string
             
             # 6. upload files
