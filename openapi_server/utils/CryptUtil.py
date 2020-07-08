@@ -5,6 +5,10 @@ class CryptUtil:
     def __init__(self):
         pass
 
+    def generateEciesKey(self):
+        eth_key = generate_eth_key()
+        return eth_key
+
     def encrypt(self, publickey_hex, bytesdata):
         return encrypt(publickey_hex, bytesdata)
 

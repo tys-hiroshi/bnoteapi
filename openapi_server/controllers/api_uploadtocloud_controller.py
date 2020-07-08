@@ -28,6 +28,7 @@ import datetime
 from openapi_server.utils.DivideFile import DivideFile
 from openapi_server.utils.DivideStream import DivideStream
 from openapi_server.utils.GenRandom import GenRandom
+from openapi_server.utils.CryptUtil import CryptUtil
 from pprint import pprint
 
 configFile = "app_config.yml"
@@ -120,8 +121,16 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
                 index += 1
             
             ## when divided teststring.txt ( chunkSize = 81 ), then upload file is random.
-            
+
             # 5. encrypt generate random index array to string
+            maped_random_index_list = map(str, random_index_list)  #mapで要素すべてを文字列に
+            random_index_str = ','.join(maped_random_index_list)
+
+            cryptUtil = CryptUtil()
+            generate_key = cryptUtil.generateEciesKey()
+            secret_key = generate_key.to_hex()
+            public_key = generate_key.public_key.to_hex()
+            encrypt_str = cryptUtil.encrypt(public_key, random_index_str.encode())
             
             # 6. upload files
 
