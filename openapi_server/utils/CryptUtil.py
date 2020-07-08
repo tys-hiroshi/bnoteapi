@@ -1,16 +1,16 @@
 from ecies.utils import generate_eth_key, generate_key
 from ecies import encrypt, decrypt
 # pip3 install eciespy
+class CryptUtil:
+    def __init__(self):
+        pass
 
-def __init__(self):
-    pass
+    def encrypt(self, publickey_hex, bytesdata):
+        return encrypt(publickey_hex, bytesdata)
 
-def encrypt(self, bytesdata):
-    eth_k = generate_eth_key()
-    secretkey_hex = eth_k.to_hex()  # hex string
-    publickey_hex = eth_k.public_key.to_hex()  # hex string
-    return encrypt(publickey_hex, bytesdata)
-    
+    def decrypt(self, secretkey_hex, encrypt_str, ):
+        return decrypt(secretkey_hex, encrypt_str)
+
 # eth_k = generate_eth_key()
 # sk_hex = eth_k.to_hex()  # hex string
 # pk_hex = eth_k.public_key.to_hex()  # hex string
