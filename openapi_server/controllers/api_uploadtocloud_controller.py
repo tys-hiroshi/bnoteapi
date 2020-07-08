@@ -91,8 +91,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
             # 1. divid upload file
             # 2. get divid file array
             divideStream = DivideStream()
-            chunkSize = 81
-            # 300000 Byte で分割
+            chunkSize = 100000
+            # 100000 Byte = 100kb で分割
             dividedStreamList = divideStream.divide_stream(stream, chunkSize)
 
             # 3. generate random index array
