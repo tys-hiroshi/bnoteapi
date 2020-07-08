@@ -119,7 +119,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
                 blob_client.upload_blob(dividedStreamList[i])
                 index += 1
             
-            ## when divided teststring.txt, 
+            ## when divided teststring.txt ( chunkSize = 81 ), then upload file is random.
+            
             # 5. encrypt generate random index array to string
             
             # 6. upload files
