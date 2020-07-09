@@ -177,6 +177,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             # #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
             # app.app.logger.info(txid)
             ### encrypt_str = encrypt_str.decode('utf-8') #it's error
+            aaa = bytes(encrypt_str_hex, 'utf-8')
             return ResponseUploadToCloudModel(0, encrypt_str_hex).to_dict(), 200
         else:
             return ResponseUploadToCloudModel(400, "").to_dict(), 400
