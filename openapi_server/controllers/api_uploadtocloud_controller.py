@@ -124,8 +124,11 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             maped_random_index_list = map(str, random_index_list)  #mapで要素すべてを文字列に
             random_index_str = ','.join(maped_random_index_list)
             cryptUtil = CryptUtil()
-            public_key_hex = request.form["public_key_hex"] ## 多分引数ではだめだったと。
-            encrypt_str_hex = cryptUtil.encrypt(public_key_hex, random_index_str.encode()).hex()
+            #public_key_hex = request.form["public_key_hex"] ## 多分引数ではだめだったと。
+            genkey = cryptUtil.generateEciesKey()
+            secretkey = genkey.to_hex
+            public_key_hex = genkey.public_key.to_hex
+            encrypt_str_hex = cryptUtil.encrypt(public_key_hex, random_index_str.encode())
             #decrypt_str = cryptUtil.decrypt(secret_key, encrypt_str)  ##it's success (return is bytes)
             
             # 6. upload files
@@ -177,7 +180,10 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             # #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
             # app.app.logger.info(txid)
             ### encrypt_str = encrypt_str.decode('utf-8') #it's error
-            aaa = bytes(encrypt_str_hex, 'utf-8')
+            #aaa = bytes(encrypt_str_hex, 'utf-8')
+            encrypt_str_hex = encrypt_str_hex.hex()
+            secret_key_hex = secretkey #0x4b4a17122a571400324fd9fd3f16bcda7f4b5178f716b84b311675c0cbb89ee3
+            decrypt_str = cryptUtil.decrypt(secret_key_hex, encrypt_str_hex)  ##it's success (return is bytes)
             return ResponseUploadToCloudModel(0, encrypt_str_hex).to_dict(), 200
         else:
             return ResponseUploadToCloudModel(400, "").to_dict(), 400

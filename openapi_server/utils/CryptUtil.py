@@ -12,8 +12,8 @@ class CryptUtil:
     def encrypt(self, publickey_hex, bytesdata):
         return encrypt(publickey_hex, bytesdata)
 
-    def decrypt(self, secretkey_hex, encrypt_str, ):
-        return decrypt(secretkey_hex, encrypt_str)
+    def decrypt(self, secretkey_hex, encrypt_str_bytes, ):
+        return decrypt(secretkey_hex, encrypt_str_bytes)
 
 # eth_k = generate_eth_key()
 # sk_hex = eth_k.to_hex()  # hex string
