@@ -131,7 +131,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
             secret_key = generate_key.to_hex()
             public_key = generate_key.public_key.to_hex()
             encrypt_str = cryptUtil.encrypt(public_key, random_index_str.encode())
-            decrypt_str = cryptUtil.decrypt(secret_key, encrypt_str)  ##it's success (return is bytes)
+            #decrypt_str = cryptUtil.decrypt(secret_key, encrypt_str)  ##it's success (return is bytes)
             
             # 6. upload files
 
