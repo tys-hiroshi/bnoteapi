@@ -107,6 +107,36 @@ paths:
       - api
       x-codegen-request-body-name: body
       x-openapi-router-controller: openapi_server.controllers.api_mnemonic_controller
+  /api/genkey/{typeid}:
+    get:
+      description: Generate Ecies Public Key and Secret Key.
+      operationId: api_genkey
+      parameters:
+      - description: bitcoin sv address
+        explode: true
+        in: path
+        name: typeid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseGenKeyModel'
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid Order
+      security:
+      - api_key: []
+      summary: Generate Ecies Public Key and Secret Key.
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_genkey_controller
   /api/tx/{addr}:
     get:
       description: get transaction from mongodb.
@@ -225,6 +255,7 @@ paths:
       description: convert mnemonic words to wif, asset on Bitcoin SV.
       operationId: api_uploadtocloud
       requestBody:
+        $ref: '#/components/requestBodies/inline_objectcloud'
         content:
           multipart/form-data:
             schema:
@@ -234,8 +265,10 @@ paths:
                 file:
                   format: binary
                   type: string
+                public_key_hex:
+                  type: string
               type: object
-        description: request /api/upload
+        description: request /api/uploadtocloud
         required: true
       responses:
         "200":
@@ -289,6 +322,12 @@ components:
         multipart/form-data:
           schema:
             $ref: '#/components/schemas/inline_object'
+      required: true
+    inline_objectcloud:
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/inline_objectcloud'
       required: true
   schemas:
     RequestUploadTextModel:
@@ -381,16 +420,28 @@ components:
           type: string
       title: response /api/upload
       type: object
+    ResponseGenKeyModel:
+      description: response /api/genkey/{typeid}
+      example:
+        public_key_hex: "public_key_hex"
+        secret_key_hex: "secret_key_hex"
+      properties:
+        public_key_hex:
+          type: string
+        secret_key_hex:
+          type: string
+      title: response /api/genkey/{typeid}
+      type: object
     ResponseUploadToCloudModel:
-      description: response /api/upload
+      description: response /api/uploadtocloud
       example:
         code: 0
-        txid: transaction id
+        encrypt_str: transaction id
       properties:
         code:
           format: int32
           type: integer
-        txid:
+        encrypt_str:
           type: string
       title: response /api/uploadtocloud
       type: object
@@ -427,6 +478,16 @@ components:
     inline_object:
       properties:
         privatekey_wif:
+          type: string
+        file:
+          format: binary
+          type: string
+      type: object
+    inline_objectcloud:
+      properties:
+        privatekey_wif:
+          type: string
+        public_key_hex:
           type: string
         file:
           format: binary

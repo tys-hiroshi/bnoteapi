@@ -61,13 +61,18 @@ def convert_filename_jpeg_to_jpg(filename):
     newfilename = f"{basename_without_ext}.{extension}"
     return newfilename
 
-def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
+def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  # noqa: E501
     """upload file on Cloud
 
     convert mnemonic words to wif, asset on Bitcoin SV. # noqa: E501
 
+    :param privatekey_wif: 
+    :type privatekey_wif: str
     :param file: 
     :type file: str
+    :param public_key_hex: 
+    :type public_key_hex: str
+
 
     :rtype: ResponseUploadToCloudModel
     """
@@ -125,12 +130,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None):  # noqa: E501
             # 5. encrypt generate random index array to string
             maped_random_index_list = map(str, random_index_list)  #mapで要素すべてを文字列に
             random_index_str = ','.join(maped_random_index_list)
-
             cryptUtil = CryptUtil()
-            generate_key = cryptUtil.generateEciesKey()
-            secret_key = generate_key.to_hex()
-            public_key = generate_key.public_key.to_hex()
-            encrypt_str = cryptUtil.encrypt(public_key, random_index_str.encode())
+            encrypt_str = cryptUtil.encrypt(public_key_hex, random_index_str.encode())
             #decrypt_str = cryptUtil.decrypt(secret_key, encrypt_str)  ##it's success (return is bytes)
             
             # 6. upload files
