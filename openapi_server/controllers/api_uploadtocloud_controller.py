@@ -1,14 +1,7 @@
 import connexion
 import six
 
-from openapi_server.models.request_add_address_model import RequestAddAddressModel  # noqa: E501
-from openapi_server.models.request_mnemonic_model import RequestMnemonicModel  # noqa: E501
-from openapi_server.models.request_upload_text_model import RequestUploadTextModel  # noqa: E501
-from openapi_server.models.response_add_address_model import ResponseAddAddressModel  # noqa: E501
-from openapi_server.models.response_mnemonic_model import ResponseMnemonicModel  # noqa: E501
-from openapi_server.models.response_tx_model import ResponseTxModel  # noqa: E501
-from openapi_server.models.response_upload_model import ResponseUploadModel  # noqa: E501
-from openapi_server.models.response_upload_text_model import ResponseUploadTextModel  # noqa: E501
+from openapi_server.models.response_uploadtocloud_model import ResponseUploadToCloudModel  # noqa: E501
 from openapi_server import util
 
 import polyglot
@@ -131,7 +124,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             maped_random_index_list = map(str, random_index_list)  #mapで要素すべてを文字列に
             random_index_str = ','.join(maped_random_index_list)
             cryptUtil = CryptUtil()
-            encrypt_str = cryptUtil.encrypt(public_key_hex, random_index_str.encode())
+            public_key_hex = request.form["public_key_hex"] ## 多分引数ではだめだったと。
+            encrypt_str_hex = cryptUtil.encrypt(public_key_hex, random_index_str.encode()).hex()
             #decrypt_str = cryptUtil.decrypt(secret_key, encrypt_str)  ##it's success (return is bytes)
             
             # 6. upload files
@@ -182,10 +176,10 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             # #transaction = uploader.upload_b(filepath)
             # #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
             # app.app.logger.info(txid)
-            txid = -1
-            return ResponseUploadModel(0, txid).to_dict(), 200
+            ### encrypt_str = encrypt_str.decode('utf-8') #it's error
+            return ResponseUploadToCloudModel(0, encrypt_str_hex).to_dict(), 200
         else:
-            return ResponseUploadModel(400, "").to_dict(), 400
+            return ResponseUploadToCloudModel(400, "").to_dict(), 400
     except Exception as e:
         app.app.logger.error("!!Exception!!")
         app.app.logger.error(e)
