@@ -15,26 +15,31 @@ class ResponseUploadToCloudModel(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, code=None, encrypt_str=None):  # noqa: E501
+    def __init__(self, code=None, file_id=None, encrypt_hex=None):  # noqa: E501
         """ResponseUploadToCloudModel - a model defined in OpenAPI
 
         :param code: The code of this ResponseUploadToCloudModel.  # noqa: E501
         :type code: int
-        :param encrypt_str: The encrypt_str of this ResponseUploadToCloudModel.  # noqa: E501
-        :type encrypt_str: str
+        :param file_id: The file_id of this ResponseUploadToCloudModel.  # noqa: E501
+        :type file_id: str
+        :param encrypt_hex: The encrypt_hex of this ResponseUploadToCloudModel.  # noqa: E501
+        :type encrypt_hex: str
         """
         self.openapi_types = {
             'code': int,
-            'encrypt_str': str
+            'file_id': str,
+            'encrypt_hex': str
         }
 
         self.attribute_map = {
             'code': 'code',
-            'encrypt_str': 'encrypt_str'
+            'file_id': 'datetime_uid',
+            'encrypt_hex': 'encrypt_hex'
         }
 
         self._code = code
-        self._encrypt_str = encrypt_str
+        self._file_id = file_id
+        self._encrypt_hex = encrypt_hex
 
     @classmethod
     def from_dict(cls, dikt) -> 'ResponseUploadToCloudModel':
@@ -69,22 +74,43 @@ class ResponseUploadToCloudModel(Model):
         self._code = code
 
     @property
-    def encrypt_str(self):
-        """Gets the encrypt_str of this ResponseUploadToCloudModel.
+    def file_id(self):
+        """Gets the file_id of this ResponseUploadToCloudModel.
 
 
-        :return: The encrypt_str of this ResponseUploadToCloudModel.
+        :return: The file_id of this ResponseUploadToCloudModel.
         :rtype: str
         """
-        return self._encrypt_str
+        return self._file_id
 
-    @encrypt_str.setter
-    def encrypt_str(self, encrypt_str):
-        """Sets the encrypt_str of this ResponseUploadToCloudModel.
+    @file_id.setter
+    def file_id(self, file_id):
+        """Sets the file_id of this ResponseUploadToCloudModel.
 
 
-        :param encrypt_str: The encrypt_str of this ResponseUploadToCloudModel.
-        :type encrypt_str: str
+        :param file_id: The file_id of this ResponseUploadToCloudModel.
+        :type file_id: str
         """
 
-        self._encrypt_str = encrypt_str
+        self._file_id = file_id
+
+    @property
+    def encrypt_hex(self):
+        """Gets the encrypt_hex of this ResponseUploadToCloudModel.
+
+
+        :return: The encrypt_hex of this ResponseUploadToCloudModel.
+        :rtype: str
+        """
+        return self._encrypt_hex
+
+    @encrypt_hex.setter
+    def encrypt_hex(self, encrypt_hex):
+        """Sets the encrypt_hex of this ResponseUploadToCloudModel.
+
+
+        :param encrypt_hex: The encrypt_hex of this ResponseUploadToCloudModel.
+        :type encrypt_hex: str
+        """
+
+        self._encrypt_hex = encrypt_hex

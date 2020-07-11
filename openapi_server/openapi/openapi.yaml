@@ -79,6 +79,61 @@ paths:
       - api
       x-codegen-request-body-name: body
       x-openapi-router-controller: openapi_server.controllers.api_download_controller
+  /api/downloadfromcloud:
+    get:
+      description: downloadfromcloud
+      operationId: api_downloadfromcloud
+      parameters:
+        - description: file_id
+          explode: true
+          in: query
+          name: file_id
+          required: true
+          schema:
+            type: string
+          style: form
+        - description: secret_key_hex
+          explode: true
+          in: query
+          name: secret_key_hex
+          required: true
+          schema:
+            type: string
+          style: form
+        - description: encrypt_hex
+          explode: true
+          in: query
+          name: encrypt_hex
+          required: true
+          schema:
+            type: string
+          style: form
+      responses:
+        "200":
+          content:
+            image/png:
+              schema:
+                format: binary
+                type: string
+            image/jpeg:
+              schema:
+                format: binary
+                type: string
+            text/plain:
+              schema:
+                format: binary
+                type: string
+          description: successful operation
+        "400":
+          content: {}
+          description: Invalid status value
+      security:
+      - api_key: []
+      summary: get data for transaction id on Bitcoin SV.
+      tags:
+      - api
+      x-codegen-request-body-name: body
+      x-openapi-router-controller: openapi_server.controllers.api_downloadfromcloud_controller
   /api/mnemonic:
     post:
       description: convert mnemonic words to wif, asset on Bitcoin SV.
@@ -436,12 +491,15 @@ components:
       description: response /api/uploadtocloud
       example:
         code: 0
-        encrypt_str: transaction id
+        file_id: file id
+        encrypt_hex: encrypt random index list to hex
       properties:
         code:
           format: int32
           type: integer
-        encrypt_str:
+        file_id:
+          type: string
+        encrypt_hex:
           type: string
       title: response /api/uploadtocloud
       type: object

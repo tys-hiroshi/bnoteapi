@@ -29,6 +29,7 @@ config = Config(configFile).content
 ACCOUNT_NAME = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_NAME']
 ACCOUNT_KEY = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_KEY']
 CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(ACCOUNT_NAME, ACCOUNT_KEY)
+UPLOAD_CONTAINER_NAME = config['API_CONFIG']['AZURE_INFO']['UPLOAD_CONTAINER_NAME']
 
 # アップロードされる拡張子の制限
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt', 'md', 'json', 'yaml', 'yml'])
@@ -98,19 +99,20 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             random_index_list = genRandom.generate_random_index(len(dividedStreamList))
             # 4. divided file array is numbering random index
             ## random_index_list の上から順にValue(index)に対応する dividedStreamList のIndexのValueをUploadする
-            containerName = "containertest"
-            azUploader = AzureUploader(CONNECTION_STRING, containerName)
+
+            azUploader = AzureUploader(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
             azUploader.make_container_retry()
             dt_now = datetime.datetime.now()
             # Create the BlobServiceClient object which will be used to create a container client
             blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
             uid = str(uuid.uuid4().hex)
             index = 0
+            dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
+            file_id = "{}_{}".format(dateTimeNowStr, uid)
             for i in random_index_list:
-                dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
-                file_name = "upload{}_{}_{}.{}".format(dateTimeNowStr, uid, str(index).zfill(6), file_extention)
+                file_name = "{}_{}.{}".format(file_id, str(index).zfill(6), file_extention)
                 # Create a blob client using the local file name as the name for the blob
-                blob_client = blob_service_client.get_blob_client(container=containerName, blob=file_name)
+                blob_client = blob_service_client.get_blob_client(UPLOAD_CONTAINER_NAME, file_name)
 
                 print("\nUploading to Azure Storage as blob:\n\t" + file_name)
 
@@ -192,7 +194,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             # decrypt_str_bytes = cryptUtil.decrypt(secret_key, encrypt_str_bytes)
             # decrypt_str = decrypt_str_bytes.decode('utf-8')
 
-            return ResponseUploadToCloudModel(0, encrypt_str_hex).to_dict(), 200
+            return ResponseUploadToCloudModel(0, file_id, encrypt_str_hex).to_dict(), 200
         else:
             return ResponseUploadToCloudModel(400, "").to_dict(), 400
     except Exception as e:
