@@ -38,6 +38,15 @@ class DivideStream:
                 saveFile.write(data)
                 saveFile.flush()
 
+    # 渡されたファイルリストの順序で１つのファイルに結合する
+    def join_stream(self, streamList, filePath):
+
+        with open(filePath, 'wb') as saveFile:
+            for f in streamList:
+                #data = open(f, "rb").read()
+                saveFile.write(f.read())
+                saveFile.flush()
+
     # 指定された部分データをファイルから取得する
     def partial_content(self, filePath, start, end):
 
