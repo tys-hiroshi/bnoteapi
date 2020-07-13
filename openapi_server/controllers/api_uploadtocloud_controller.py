@@ -22,6 +22,7 @@ from openapi_server.utils.DivideFile import DivideFile
 from openapi_server.utils.DivideStream import DivideStream
 from openapi_server.utils.GenRandom import GenRandom
 from openapi_server.utils.CryptUtil import CryptUtil
+from openapi_server.utils.FileUtil import FileUtil
 from pprint import pprint
 
 configFile = "app_config.yml"
@@ -38,22 +39,6 @@ def allwed_file(filename):
     # .があるかどうかのチェックと、拡張子の確認
     # OKなら１、だめなら0
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def get_file_extention(filename):
-    return filename.rsplit('.', 1)[1].lower()
-
-def convert_filename_jpeg_to_jpg(filename):
-    basename_without_ext = filename.split('.')[0]
-    print("basename_without_ext")
-    print(basename_without_ext)
-    extension = filename.rsplit('.', 1)[1].lower()
-    print("extension")
-    print(extension)
-    if extension == "jpeg":
-        extension = "jpg"
-    newfilename = f"{basename_without_ext}.{extension}"
-    return newfilename
 
 def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  # noqa: E501
     """upload file on Cloud
@@ -89,8 +74,9 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             return {}, 400
         # ファイルのチェック
         if req_file and allwed_file(req_file.filename):
-            filename = convert_filename_jpeg_to_jpg(req_file.filename)
-            file_extention = get_file_extention(filename)
+            fileUtil = FileUtil()
+            filename = fileUtil.convert_filename_jpeg_to_jpg(req_file.filename)
+            file_extention = fileUtil.get_file_extention(filename)
             # 1. divid upload file
             # 2. get divid file array
             divideStream = DivideStream()

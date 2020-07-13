@@ -14,6 +14,7 @@ from azure.storage.blob import BlobServiceClient, generate_account_sas, Resource
 from openapi_server.utils.DivideStream import DivideStream
 import io
 from openapi_server.utils.CryptUtil import CryptUtil
+from openapi_server.utils.FileUtil import FileUtil
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -39,13 +40,19 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     blob_list = container.list_blobs(file_id)
     random_stream_list = []
     stream_list = []
+    file_extension = ""
+    fileUtil = FileUtil()
     for blob in blob_list:
+        filename = fileUtil.convert_filename_jpeg_to_jpg(blob.name)
+        file_extention = fileUtil.get_file_extention(filename)
+        
         print(blob.name + '\n')
         blob = BlobClient.from_connection_string(
             CONNECTION_STRING, UPLOAD_CONTAINER_NAME, blob.name)
 
         blob_data = blob.download_blob().readall() # StorageStreamDownloader
         random_stream_list.append(blob_data)
+
     sort_list = []
     for idx, val in enumerate(random_index_list):
         sort_list.append(dict(idx= idx, val=val))
@@ -59,14 +66,15 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     divideStream = DivideStream()
     divideStream.join_stream(stream_list, "join_file")
     
+    downloadFilename = "{}.{}".format(file_id, file_extension)
     # #headers["Content-Disposition"] = 'attachment; filename=' + downloadFilename
-    # header_ContentDisposition = 'attachment; filename=' + downloadFilename
-    # mimetype = upload_mimetype
+    header_ContentDisposition = 'attachment; filename=' + downloadFilename
+    mimetype = fileUtil.get_media_type_for_extension(file_extension)
     
-    # response = app.app.make_response(data)
-    # response.data = data
-    # response.headers["Content-Disposition"] = header_ContentDisposition
-    # response.mimetype = mimetype
+    response = app.app.make_response(data)
+    response.data = data
+    response.headers["Content-Disposition"] = header_ContentDisposition
+    response.mimetype = mimetype
 
 
     return {}, 200
