@@ -46,9 +46,13 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
 
         blob_data = blob.download_blob().readall() # StorageStreamDownloader
         random_stream_list.append(blob_data)
-    
-    for index in random_index_list:
-        stream_list.append(random_stream_list[int(index)])
+    sort_list = []
+    for idx, val in enumerate(random_index_list):
+        sort_list.append(dict(idx= idx, val=val))
+
+    sorted_list = sorted(sort_list, key=lambda x:x['val'])
+    for item  in sorted_list:
+        stream_list.append(random_stream_list[item["idx"]])
 
     ## https://docs.microsoft.com/en-us/python/api/azure-storage-file-datalake/azure.storage.filedatalake.storagestreamdownloader?view=azure-python
 

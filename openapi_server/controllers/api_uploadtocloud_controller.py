@@ -70,7 +70,11 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
 
     :rtype: ResponseUploadToCloudModel
     """
-    
+    # {
+    #   "code": 0,
+    #   "encrypt_hex": "0485f17ac943cc89b8625431a49f79d58d5593594b5daebe2feb604d0671409157b730176c143373472bc7368225d133a46b51648a794a7d1b4347e5b4222b2bb50cd003f816ca562437379282cf949232c7f78305baf2165303e4fe0cacf74c059595dcdae6",
+    #   "file_id": "20200713232737_a1643b1db443499c806514a71980d55b"
+    # }
     try:
         req_file = file
 
@@ -90,8 +94,9 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             # 1. divid upload file
             # 2. get divid file array
             divideStream = DivideStream()
-            #chunkSize = 100000
-            chunkSize = 81  ## for Test
+            chunkSize = 50000  #50kb
+            #chunkSize = 100000  #100kb
+            #chunkSize = 81  ## for Test
             # 100000 Byte = 100kb で分割
             dividedStreamList = divideStream.divide_stream(stream, chunkSize)
 
