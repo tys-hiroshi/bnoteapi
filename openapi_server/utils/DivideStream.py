@@ -40,11 +40,10 @@ class DivideStream:
 
     # 渡されたファイルリストの順序で１つのファイルに結合する
     def join_stream(self, streamList, filePath):
-
         with open(filePath, 'wb') as saveFile:
-            for f in streamList:
+            for stream in streamList:
                 #data = open(f, "rb").read()
-                saveFile.write(f.read())
+                saveFile.write(stream)
                 saveFile.flush()
 
     # 指定された部分データをファイルから取得する

@@ -34,11 +34,14 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
         blob = BlobClient.from_connection_string(
             CONNECTION_STRING, UPLOAD_CONTAINER_NAME, blob.name)
 
-        blob_data = blob.download_blob() # StorageStreamDownloader
+        blob_data = blob.download_blob().readall() # StorageStreamDownloader
         print("aaaa")
-        stream = io.StringIO("aaaaa")
-        blob_data.readinto(stream)
+        stream = blob_data
+        #stream = open(file, 'rb').read()
         stream_list.append(stream)
+        
+        # blob_data.readinto(stream)
+        # stream_list.append(stream)
 
     ## https://docs.microsoft.com/en-us/python/api/azure-storage-file-datalake/azure.storage.filedatalake.storagestreamdownloader?view=azure-python
 

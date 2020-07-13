@@ -90,7 +90,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             # 1. divid upload file
             # 2. get divid file array
             divideStream = DivideStream()
-            chunkSize = 100000
+            #chunkSize = 100000
+            chunkSize = 50  ## for Test
             # 100000 Byte = 100kb で分割
             dividedStreamList = divideStream.divide_stream(stream, chunkSize)
 
