@@ -13,6 +13,7 @@ from openapi_server.utils.Config import Config
 from azure.storage.blob import BlobServiceClient, generate_account_sas, ResourceTypes, AccountSasPermissions, ContainerClient, BlobClient
 from openapi_server.utils.DivideStream import DivideStream
 import io
+from openapi_server.utils.CryptUtil import CryptUtil
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -27,7 +28,16 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     # secret_key_hex = request.form["secret_key_hex"]
     # encrypt_hex = request.form["encrypt_hex"]
     
+    #it's decrypt process.
+    cryptUtil = CryptUtil()
+
+    encrypt_str_bytes = bytes.fromhex(encrypt_hex)
+    decrypt_str_bytes = cryptUtil.decrypt(secret_key_hex, encrypt_str_bytes)
+    decrypt_str = decrypt_str_bytes.decode('utf-8')
+    random_index_list = decrypt_str.split(',')
+
     blob_list = container.list_blobs(file_id)
+    random_stream_list = []
     stream_list = []
     for blob in blob_list:
         print(blob.name + '\n')
@@ -35,20 +45,16 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
             CONNECTION_STRING, UPLOAD_CONTAINER_NAME, blob.name)
 
         blob_data = blob.download_blob().readall() # StorageStreamDownloader
-        print("aaaa")
-        stream = blob_data
-        #stream = open(file, 'rb').read()
-        stream_list.append(stream)
-        
-        # blob_data.readinto(stream)
-        # stream_list.append(stream)
+        random_stream_list.append(blob_data)
+    
+    for index in random_index_list:
+        stream_list.append(random_stream_list[int(index)])
 
     ## https://docs.microsoft.com/en-us/python/api/azure-storage-file-datalake/azure.storage.filedatalake.storagestreamdownloader?view=azure-python
 
     divideStream = DivideStream()
     divideStream.join_stream(stream_list, "join_file")
     
-    # downloadFilename = upload_filename
     # #headers["Content-Disposition"] = 'attachment; filename=' + downloadFilename
     # header_ContentDisposition = 'attachment; filename=' + downloadFilename
     # mimetype = upload_mimetype
@@ -57,4 +63,6 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     # response.data = data
     # response.headers["Content-Disposition"] = header_ContentDisposition
     # response.mimetype = mimetype
+
+
     return {}, 200

@@ -91,7 +91,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             # 2. get divid file array
             divideStream = DivideStream()
             #chunkSize = 100000
-            chunkSize = 50  ## for Test
+            chunkSize = 81  ## for Test
             # 100000 Byte = 100kb で分割
             dividedStreamList = divideStream.divide_stream(stream, chunkSize)
 
@@ -118,7 +118,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
                 print("\nUploading to Azure Storage as blob:\n\t" + file_name)
 
                 # Upload the created file
-                blob_client.upload_blob(dividedStreamList[i])
+                blob_client.upload_blob(dividedStreamList[i])  ## i is random index
                 index += 1
             
             ## when divided teststring.txt ( chunkSize = 81 ), then upload file is random.
