@@ -76,7 +76,9 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
         saveFile.write(bs.getbuffer())
         #saveFile.write(bs.read())
         saveFile.flush()
+    bs.seek(0)
     joined_stream_to_bytes = bs.read()
+    aaaaaa = bs.getvalue()
     
     downloadFilename = "{}.{}".format(file_id, file_extension)
     # #headers["Content-Disposition"] = 'attachment; filename=' + downloadFilename
@@ -88,4 +90,4 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     response.mimetype = mimetype
 
 
-    return {}, 200
+    return response, 200
