@@ -68,14 +68,15 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     divideStream = DivideStream()
     #divideStream.join_stream(stream_list, "join_file")
     
-    with BytesIO() as bs:
-        joined_stream = divideStream.join_stream_to_bytes(stream_list, bs)
+    bs = io.BytesIO()
+    joined_stream = divideStream.join_stream_to_bytes(stream_list, bs)
 
-        filePath = "join_file"
-        with open(filePath, 'wb') as saveFile:
-            saveFile.write(bs.read())
-            saveFile.flush()
-    joined_stream_to_bytes = joined_stream
+    filePath = "join_file.jpg"
+    with open(filePath, 'wb') as saveFile:
+        saveFile.write(bs.getbuffer())
+        #saveFile.write(bs.read())
+        saveFile.flush()
+    joined_stream_to_bytes = bs.read()
     
     downloadFilename = "{}.{}".format(file_id, file_extension)
     # #headers["Content-Disposition"] = 'attachment; filename=' + downloadFilename
