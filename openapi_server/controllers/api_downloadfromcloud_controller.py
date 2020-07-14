@@ -71,14 +71,17 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     bs = io.BytesIO()
     joined_stream = divideStream.join_stream_to_bytes(stream_list, bs)
 
-    filePath = "join_file.jpg"
-    with open(filePath, 'wb') as saveFile:
-        saveFile.write(bs.getbuffer())
-        #saveFile.write(bs.read())
-        saveFile.flush()
-    bs.seek(0)
-    joined_stream_to_bytes = bs.read()
-    aaaaaa = bs.getvalue()
+    # filePath = "join_file.jpg"
+    # with open(filePath, 'wb') as saveFile:
+    #     saveFile.write(bs.getbuffer())
+    #     #saveFile.write(bs.read())
+    #     saveFile.flush()
+    #https://stackoverflow.com/questions/54137790/how-do-i-convert-from-io-bytesio-to-a-bytes-like-object-in-python3-6
+    
+    #bs.seek(0)
+    #joined_stream_to_bytes = bs.read()
+    # or 
+    joined_stream_to_bytes = bs.getvalue()
     
     downloadFilename = "{}.{}".format(file_id, file_extension)
     # #headers["Content-Disposition"] = 'attachment; filename=' + downloadFilename
