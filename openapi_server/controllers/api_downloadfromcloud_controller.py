@@ -16,6 +16,8 @@ import io
 from openapi_server.utils.CryptUtil import CryptUtil
 from openapi_server.utils.FileUtil import FileUtil
 
+from io import BytesIO
+
 configFile = "app_config.yml"
 config = Config(configFile).content
 ACCOUNT_NAME = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_NAME']
@@ -44,7 +46,7 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     fileUtil = FileUtil()
     for blob in blob_list:
         filename = fileUtil.convert_filename_jpeg_to_jpg(blob.name)
-        file_extention = fileUtil.get_file_extention(filename)
+        file_extension = fileUtil.get_file_extention(filename)
         
         print(blob.name + '\n')
         blob = BlobClient.from_connection_string(
@@ -64,15 +66,23 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     ## https://docs.microsoft.com/en-us/python/api/azure-storage-file-datalake/azure.storage.filedatalake.storagestreamdownloader?view=azure-python
 
     divideStream = DivideStream()
-    divideStream.join_stream(stream_list, "join_file")
+    #divideStream.join_stream(stream_list, "join_file")
+    
+    with BytesIO() as bs:
+        joined_stream = divideStream.join_stream_to_bytes(stream_list, bs)
+
+        filePath = "join_file"
+        with open(filePath, 'wb') as saveFile:
+            saveFile.write(bs.read())
+            saveFile.flush()
+    joined_stream_to_bytes = joined_stream
     
     downloadFilename = "{}.{}".format(file_id, file_extension)
     # #headers["Content-Disposition"] = 'attachment; filename=' + downloadFilename
     header_ContentDisposition = 'attachment; filename=' + downloadFilename
     mimetype = fileUtil.get_media_type_for_extension(file_extension)
-    
-    response = app.app.make_response(data)
-    response.data = data
+    response = app.app.make_response(joined_stream_to_bytes)
+    response.data = joined_stream_to_bytes
     response.headers["Content-Disposition"] = header_ContentDisposition
     response.mimetype = mimetype
 

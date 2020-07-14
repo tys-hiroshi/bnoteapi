@@ -2,6 +2,8 @@
 
 ## https://qiita.com/5zm/items/49118188d76e61ca5113
 import os
+from io import BytesIO
+import contextlib
 
 class DivideStream:
     def __init__(self):
@@ -39,12 +41,20 @@ class DivideStream:
                 saveFile.flush()
 
     # 渡されたファイルリストの順序で１つのファイルに結合する
-    def join_stream(self, streamList, filePath):
-        with open(filePath, 'wb') as saveFile:
+    #https://blog.hirokiky.org/entry/2019/04/29/161729
+    @contextlib.contextmanager
+    def join_stream(self, streamList):
+        with BytesIO() as bs:
             for stream in streamList:
-                #data = open(f, "rb").read()
-                saveFile.write(stream)
-                saveFile.flush()
+                bs.write(stream)
+            yield bs
+    
+    # 渡されたファイルリストの順序で１つのファイルに結合する
+    #https://blog.hirokiky.org/entry/2019/04/29/161729
+    def join_stream_to_bytes(self, streamList, bytesio):
+        for stream in streamList:
+            bytesio.write(stream)
+        return bytesio
 
     # 指定された部分データをファイルから取得する
     def partial_content(self, filePath, start, end):
