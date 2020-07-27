@@ -69,7 +69,7 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     #divideStream.join_stream(stream_list, "join_file")
     
     bs = io.BytesIO()
-    joined_stream = divideStream.join_stream_to_bytes(stream_list, bs)
+    divideStream.join_stream_to_bytes(stream_list, bs)
 
     # filePath = "join_file.jpg"
     # with open(filePath, 'wb') as saveFile:
