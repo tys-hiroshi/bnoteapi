@@ -31,6 +31,8 @@ ACCOUNT_NAME = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_NAME']
 ACCOUNT_KEY = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_KEY']
 CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(ACCOUNT_NAME, ACCOUNT_KEY)
 UPLOAD_CONTAINER_NAME = config['API_CONFIG']['AZURE_INFO']['UPLOAD_CONTAINER_NAME']
+AZURE_INFO_CHUNK_SIZE_BYTES = config['API_CONFIG']['AZURE_INFO']['CHUNK_SIZE_BYTES']
+BSV_INFO_CHUNK_SIZE_BYTES = config['API_CONFIG']['BSV_INFO']['CHUNK_SIZE_BYTES']
 
 # アップロードされる拡張子の制限
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt', 'md', 'json', 'yaml', 'yml'])
@@ -40,7 +42,7 @@ def allwed_file(filename):
     # OKなら１、だめなら0
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  # noqa: E501
+def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_chain = None):  # noqa: E501
     """upload file on Cloud
 
     convert mnemonic words to wif, asset on Bitcoin SV. # noqa: E501
@@ -51,6 +53,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
     :type file: str
     :param public_key_hex: 
     :type public_key_hex: str
+    :param on_chain: 
+    :type on_chain: boolean
 
 
     :rtype: ResponseUploadToCloudModel
@@ -80,7 +84,11 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None):  #
             # 1. divid upload file
             # 2. get divid file array
             divideStream = DivideStream()
-            chunkSize = 50000  #50kb
+            if on_chain:
+                chunkSize = BSV_INFO_CHUNK_SIZE_BYTES
+            else:
+                chunkSize = AZURE_INFO_CHUNK_SIZE_BYTES
+
             #chunkSize = 100000  #100kb
             #chunkSize = 81  ## for Test
             # 100000 Byte = 100kb で分割

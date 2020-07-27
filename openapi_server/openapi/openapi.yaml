@@ -322,6 +322,8 @@ paths:
                   type: string
                 public_key_hex:
                   type: string
+                on_chain:
+                  type: boolean
               type: object
         description: request /api/uploadtocloud
         required: true
@@ -550,6 +552,8 @@ components:
         file:
           format: binary
           type: string
+        on_chain:
+          type: boolean
       type: object
   securitySchemes:
     api_key:
