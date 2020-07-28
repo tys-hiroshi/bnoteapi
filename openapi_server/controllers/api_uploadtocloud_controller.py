@@ -106,11 +106,14 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             # 4. divided file array is numbering random index
             ## random_index_list の上から順にValue(index)に対応する dividedStreamList のIndexのValueをUploadする
 
-            azUploader = AzureUploader(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
-            azUploader.make_container_retry()
             dt_now = datetime.datetime.now()
-            # Create the BlobServiceClient object which will be used to create a container client
-            blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
+            blob_service_client = None
+            if not on_chain:
+                azUploader = AzureUploader(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
+                azUploader.make_container_retry()
+                # Create the BlobServiceClient object which will be used to create a container client
+                blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
+
             uid = str(uuid.uuid4().hex)
             index = 0
             dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
