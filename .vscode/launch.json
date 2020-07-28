@@ -19,7 +19,8 @@
                 "./openapi_server/openapi/openapi.yaml",
                 "--port",
                 "8080"
-            ]
+            ],
+            "justMyCode": false,
         }
     ]
 }

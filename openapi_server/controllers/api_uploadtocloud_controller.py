@@ -24,6 +24,7 @@ from openapi_server.utils.GenRandom import GenRandom
 from openapi_server.utils.CryptUtil import CryptUtil
 from openapi_server.utils.FileUtil import FileUtil
 from pprint import pprint
+from distutils.util import strtobool
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -31,8 +32,8 @@ ACCOUNT_NAME = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_NAME']
 ACCOUNT_KEY = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_KEY']
 CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(ACCOUNT_NAME, ACCOUNT_KEY)
 UPLOAD_CONTAINER_NAME = config['API_CONFIG']['AZURE_INFO']['UPLOAD_CONTAINER_NAME']
-AZURE_INFO_CHUNK_SIZE_BYTES = config['API_CONFIG']['AZURE_INFO']['CHUNK_SIZE_BYTES']
-BSV_INFO_CHUNK_SIZE_BYTES = config['API_CONFIG']['BSV_INFO']['CHUNK_SIZE_BYTES']
+AZURE_INFO_CHUNK_SIZE_BYTES = int(config['API_CONFIG']['AZURE_INFO']['CHUNK_SIZE_BYTES'])
+BSV_INFO_CHUNK_SIZE_BYTES = int(config['API_CONFIG']['BSV_INFO']['CHUNK_SIZE_BYTES'])
 
 # アップロードされる拡張子の制限
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt', 'md', 'json', 'yaml', 'yml'])
@@ -55,7 +56,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
     :type public_key_hex: str
     :param on_chain: 
     :type on_chain: boolean
-
+    
 
     :rtype: ResponseUploadToCloudModel
     """
@@ -65,6 +66,10 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
     #   "file_id": "20200713232737_a1643b1db443499c806514a71980d55b"
     # }
     try:
+        privatekey_wif = request.form["privatekey_wif"]
+        public_key_hex = request.form["public_key_hex"]
+        on_chain = strtobool(request.form["on_chain"])
+        
         req_file = file
 
         stream = req_file.stream
@@ -111,13 +116,26 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             file_id = "{}_{}".format(dateTimeNowStr, uid)
             for i in random_index_list:
                 file_name = "{}_{}.{}".format(file_id, str(index).zfill(6), file_extention)
-                # Create a blob client using the local file name as the name for the blob
-                blob_client = blob_service_client.get_blob_client(UPLOAD_CONTAINER_NAME, file_name)
 
-                print("\nUploading to Azure Storage as blob:\n\t" + file_name)
+                if on_chain:
+                    ## 6-1. on blockchain
+                    uploader = polyglot.Upload(privatekey_wif, 'test')
+                    req_file_bytearray = bytearray(dividedStreamList[i])
+                    app.app.logger.info(len(req_file_bytearray))
+                    media_type = uploader.get_media_type_for_file_name(file_name)  ## WARNING: .jpeg is Error!!!!!
+                    encoding = uploader.get_encoding_for_file_name(file_name)
+                    rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, file_name)
+                    txid = uploader.send_rawtx(rawtx)
+                else:
+                    ## 6-2. on cloud
+                    # Create a blob client using the local file name as the name for the blob
+                    blob_client = blob_service_client.get_blob_client(UPLOAD_CONTAINER_NAME, file_name)
 
-                # Upload the created file
-                blob_client.upload_blob(dividedStreamList[i])  ## i is random index
+                    print("\nUploading to Azure Storage as blob:\n\t" + file_name)
+
+                    # Upload the created file
+                    blob_client.upload_blob(dividedStreamList[i])  ## i is random index
+
                 index += 1
             
             ## when divided teststring.txt ( chunkSize = 81 ), then upload file is random.
@@ -156,10 +174,6 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
 
             # # Upload the created file
             # blob_client.upload_blob(file)
-
-            ## 6-1. on blockchain
-
-            ## 6-2. on cloud
 
 
             # 7. save No.5 string in server
