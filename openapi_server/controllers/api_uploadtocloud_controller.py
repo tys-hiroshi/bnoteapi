@@ -66,6 +66,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
     #   "file_id": "20200713232737_a1643b1db443499c806514a71980d55b"
     # }
     try:
+        ## NOTE: 多分引数では値が取れないので。なぜかは知らない
         privatekey_wif = request.form["privatekey_wif"]
         public_key_hex = request.form["public_key_hex"]
         on_chain = strtobool(request.form["on_chain"])
@@ -114,18 +115,20 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             index = 0
             dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
             file_id = "{}_{}".format(dateTimeNowStr, uid)
+            tx_id_list = []
             for i in random_index_list:
                 file_name = "{}_{}.{}".format(file_id, str(index).zfill(6), file_extention)
 
                 if on_chain:
                     ## 6-1. on blockchain
-                    uploader = polyglot.Upload(privatekey_wif, 'test')
+                    uploader = polyglot.Upload(wif=privatekey_wif, network='test')
                     req_file_bytearray = bytearray(dividedStreamList[i])
                     app.app.logger.info(len(req_file_bytearray))
                     media_type = uploader.get_media_type_for_file_name(file_name)  ## WARNING: .jpeg is Error!!!!!
                     encoding = uploader.get_encoding_for_file_name(file_name)
                     rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, file_name)
-                    txid = uploader.send_rawtx(rawtx)
+                    tx_id = uploader.send_rawtx(rawtx)  ##TODO: retry or wait. リクエストが早すぎて失敗することがあるので
+                    tx_id_list.append(tx_id)
                 else:
                     ## 6-2. on cloud
                     # Create a blob client using the local file name as the name for the blob
@@ -144,8 +147,6 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             maped_random_index_list = map(str, random_index_list)  #mapで要素すべてを文字列に
             random_index_str = ','.join(maped_random_index_list)
             cryptUtil = CryptUtil()
-            
-            public_key_hex = request.form["public_key_hex"] ## 多分引数ではだめだったと。
             
             # ### test genearte key
             # genkey = cryptUtil.generateEciesKey()
@@ -208,9 +209,9 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             # decrypt_str_bytes = cryptUtil.decrypt(secret_key, encrypt_str_bytes)
             # decrypt_str = decrypt_str_bytes.decode('utf-8')
 
-            return ResponseUploadToCloudModel(0, file_id, encrypt_str_hex).to_dict(), 200
+            return ResponseUploadToCloudModel(code=0, file_id=file_id, encrypt_hex=encrypt_str_hex, tx_id_list=tx_id_list).to_dict(), 200
         else:
-            return ResponseUploadToCloudModel(400, "").to_dict(), 400
+            return ResponseUploadToCloudModel(code=400, file_id="").to_dict(), 400
     except Exception as e:
         app.app.logger.error("!!Exception!!")
         app.app.logger.error(e)

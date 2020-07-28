@@ -15,7 +15,7 @@ class ResponseUploadToCloudModel(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, code=None, file_id=None, encrypt_hex=None):  # noqa: E501
+    def __init__(self, code=None, file_id=None, encrypt_hex=None, tx_id_list=None):  # noqa: E501
         """ResponseUploadToCloudModel - a model defined in OpenAPI
 
         :param code: The code of this ResponseUploadToCloudModel.  # noqa: E501
@@ -24,22 +24,27 @@ class ResponseUploadToCloudModel(Model):
         :type file_id: str
         :param encrypt_hex: The encrypt_hex of this ResponseUploadToCloudModel.  # noqa: E501
         :type encrypt_hex: str
+        :param tx_id_list: When on_chain is true, save files on BSV. Then transactions are tx_id_list.  # noqa: E501
+        :type tx_id_list: array
         """
         self.openapi_types = {
             'code': int,
             'file_id': str,
-            'encrypt_hex': str
+            'encrypt_hex': str,
+            'tx_id_list': []
         }
 
         self.attribute_map = {
             'code': 'code',
             'file_id': 'datetime_uid',
-            'encrypt_hex': 'encrypt_hex'
+            'encrypt_hex': 'encrypt_hex',
+            'tx_id_list': ['tx_id_0', 'tx_id_1']
         }
 
         self._code = code
         self._file_id = file_id
         self._encrypt_hex = encrypt_hex
+        self._tx_id_list = tx_id_list
 
     @classmethod
     def from_dict(cls, dikt) -> 'ResponseUploadToCloudModel':
@@ -114,3 +119,24 @@ class ResponseUploadToCloudModel(Model):
         """
 
         self._encrypt_hex = encrypt_hex
+
+    @property
+    def tx_id_list(self):
+        """Gets the tx_id_list of this ResponseUploadToCloudModel.
+
+
+        :return: The tx_id_list of this ResponseUploadToCloudModel.
+        :rtype: array
+        """
+        return self._tx_id_list
+
+    @tx_id_list.setter
+    def tx_id_list(self, tx_id_list):
+        """Sets the tx_id_list of this ResponseUploadToCloudModel.
+
+
+        :param tx_id_list: The tx_id_list of this ResponseUploadToCloudModel.
+        :type tx_id_list: array
+        """
+
+        self._tx_id_list = tx_id_list
