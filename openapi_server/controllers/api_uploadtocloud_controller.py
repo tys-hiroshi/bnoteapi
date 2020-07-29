@@ -37,6 +37,8 @@ AZURE_INFO_CHUNK_SIZE_BYTES = int(config['API_CONFIG']['AZURE_INFO']['CHUNK_SIZE
 BSV_INFO_CHUNK_SIZE_BYTES = int(config['API_CONFIG']['BSV_INFO']['CHUNK_SIZE_BYTES'])
 BSV_INFO_NETWORK = config['API_CONFIG']['BSV_INFO']['NETWORK']
 
+MAX_BSV_SIZE_BYTES = 100000
+
 # アップロードされる拡張子の制限
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt', 'md', 'json', 'yaml', 'yml'])
 
@@ -218,8 +220,27 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             #calculate file hash
             hash = hashlib.new('ripemd160')
             hash.update(bytearray(stream))
-            ripemd160_value = hash.hexdigest()
+            ripemd160_hash = hash.hexdigest()
 
+            encoding = "utf-8"
+            message_bytes = ripemd160_hash.encode(encoding)
+            message_bytes_length = len(message_bytes)
+            print(message_bytes_length)
+            if(message_bytes_length >= MAX_BSV_SIZE_BYTES):   #more less 100kb = 100000bytes.
+                return ResponseUploadToCloudModel(code=400, file_id="").to_dict(), 400
+
+            req_bytearray = bytearray(message_bytes)
+            #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
+            media_type = "text/plain"
+            print(media_type)
+            print(encoding)
+            file_name = f"{file_id}_ripemd160_hash"
+            #upload data
+            uploader = polyglot.Upload(privatekey_wif, network=BSV_INFO_NETWORK)
+            print(uploader.filter_utxos_for_bcat())
+            rawtx = uploader.b_create_rawtx_from_binary(req_bytearray, media_type, encoding, file_name)
+            hash_txid = uploader.send_rawtx(rawtx)
+            tx_id_list.append(hash_txid)
             return ResponseUploadToCloudModel(code=0, file_id=file_id, encrypt_hex=encrypt_str_hex, tx_id_list=tx_id_list).to_dict(), 200
         else:
             return ResponseUploadToCloudModel(code=400, file_id="").to_dict(), 400
