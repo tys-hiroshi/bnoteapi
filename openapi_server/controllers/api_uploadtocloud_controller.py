@@ -25,6 +25,7 @@ from openapi_server.utils.CryptUtil import CryptUtil
 from openapi_server.utils.FileUtil import FileUtil
 from pprint import pprint
 from distutils.util import strtobool
+import hashlib
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -34,6 +35,7 @@ CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={}
 UPLOAD_CONTAINER_NAME = config['API_CONFIG']['AZURE_INFO']['UPLOAD_CONTAINER_NAME']
 AZURE_INFO_CHUNK_SIZE_BYTES = int(config['API_CONFIG']['AZURE_INFO']['CHUNK_SIZE_BYTES'])
 BSV_INFO_CHUNK_SIZE_BYTES = int(config['API_CONFIG']['BSV_INFO']['CHUNK_SIZE_BYTES'])
+BSV_INFO_NETWORK = config['API_CONFIG']['BSV_INFO']['NETWORK']
 
 # アップロードされる拡張子の制限
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'txt', 'md', 'json', 'yaml', 'yml'])
@@ -124,7 +126,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
 
                 if on_chain:
                     ## 6-1. on blockchain
-                    uploader = polyglot.Upload(wif=privatekey_wif, network='test')
+                    uploader = polyglot.Upload(wif=privatekey_wif, network=BSV_INFO_NETWORK)
                     req_file_bytearray = bytearray(dividedStreamList[i])
                     app.app.logger.info(len(req_file_bytearray))
                     media_type = uploader.get_media_type_for_file_name(file_name)  ## WARNING: .jpeg is Error!!!!!
@@ -137,7 +139,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
                     # Create a blob client using the local file name as the name for the blob
                     blob_client = blob_service_client.get_blob_client(UPLOAD_CONTAINER_NAME, file_name)
 
-                    print("\nUploading to Azure Storage as blob:\n\t" + file_name)
+                    app.app.logger.info("\nUploading to Azure Storage as blob:\n\t" + file_name)
 
                     # Upload the created file
                     blob_client.upload_blob(dividedStreamList[i])  ## i is random index
@@ -211,6 +213,12 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             # encrypt_str_bytes = bytes.fromhex(encrypt_str_hex)
             # decrypt_str_bytes = cryptUtil.decrypt(secret_key, encrypt_str_bytes)
             # decrypt_str = decrypt_str_bytes.decode('utf-8')
+
+            # 7. calculate file hash and write hash on BlockChain.
+            #calculate file hash
+            hash = hashlib.new('ripemd160')
+            hash.update(bytearray(stream))
+            ripemd160_value = hash.hexdigest()
 
             return ResponseUploadToCloudModel(code=0, file_id=file_id, encrypt_hex=encrypt_str_hex, tx_id_list=tx_id_list).to_dict(), 200
         else:
