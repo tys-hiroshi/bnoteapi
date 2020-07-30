@@ -65,11 +65,6 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
 
     :rtype: ResponseUploadToCloudModel
     """
-    # {
-    #   "code": 0,
-    #   "encrypt_hex": "0485f17ac943cc89b8625431a49f79d58d5593594b5daebe2feb604d0671409157b730176c143373472bc7368225d133a46b51648a794a7d1b4347e5b4222b2bb50cd003f816ca562437379282cf949232c7f78305baf2165303e4fe0cacf74c059595dcdae6",
-    #   "file_id": "20200713232737_a1643b1db443499c806514a71980d55b"
-    # }
     try:
         ## NOTE: 多分引数では値が取れないので。なぜかは知らない
         privatekey_wif = request.form["privatekey_wif"]
@@ -79,7 +74,6 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
         req_file = file
 
         stream = req_file.stream
-        #img_array = np.asarray(bytearray(stream.read()), dtype=np.uint8)
         app.app.logger.info("allwed_file(req_file.filename)")
         app.app.logger.info(allwed_file(req_file.filename))
         app.app.logger.info("req_file.filename")
@@ -95,14 +89,12 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             # 1. divid upload file
             # 2. get divid file array
             divideStream = DivideStream()
+            # ex. 100000 Byte = 100kb で分割
             if on_chain:
                 chunkSize = BSV_INFO_CHUNK_SIZE_BYTES
             else:
                 chunkSize = AZURE_INFO_CHUNK_SIZE_BYTES
-
-            #chunkSize = 100000  #100kb
-            #chunkSize = 81  ## for Test
-            # 100000 Byte = 100kb で分割
+            
             dividedStreamList = divideStream.divide_stream(stream, chunkSize)
 
             # 3. generate random index array
@@ -148,44 +140,13 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
                     blob_client.upload_blob(dividedStreamList[i])  ## i is random index
 
                 index += 1
-            
-            ## when divided teststring.txt ( chunkSize = 81 ), then upload file is random.
 
             # 5. encrypt generate random index array to string
             maped_random_index_list = map(str, random_index_list)  #mapで要素すべてを文字列に
             random_index_str = ','.join(maped_random_index_list)
             cryptUtil = CryptUtil()
             
-            # ### test genearte key
-            # genkey = cryptUtil.generateEciesKey()
-            # secret_key = genkey.to_hex()
-            # public_key_hex = genkey.public_key.to_hex()
-            # ### test genearte key
-            
             encrypt_str_hex = cryptUtil.encrypt(public_key_hex, random_index_str.encode()).hex()
-            #decrypt_str = cryptUtil.decrypt(secret_key, encrypt_str)  ##it's success (return is bytes)
-            
-            # 6. upload files
-
-            #loop = asyncio.get_event_loop()
-            # containerName = "containertest"
-            # azUploader = AzureUploader(CONNECTION_STRING, containerName)
-            # azUploader.make_container_retry()
-            # dt_now = datetime.datetime.now()
-            # dateTimeNowStr = dt_now.strftime('%Y%m%d%H%M%S')
-            # file_name = "upload{}_{}.{}".format(dateTimeNowStr, str(uuid.uuid4().hex), file_extention) 
-            # # Create the BlobServiceClient object which will be used to create a container client
-            # blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
-            # # Create a blob client using the local file name as the name for the blob
-            # blob_client = blob_service_client.get_blob_client(container=containerName, blob=file_name)
-
-            # print("\nUploading to Azure Storage as blob:\n\t" + file_name)
-
-            # # Upload the created file
-            # blob_client.upload_blob(file)
-
-
-            # 7. save No.5 string in server
 
             # 7. calculate file hash and write hash on BlockChain.
             #calculate file hash
