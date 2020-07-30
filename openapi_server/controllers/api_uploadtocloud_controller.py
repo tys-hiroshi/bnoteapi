@@ -23,6 +23,7 @@ from openapi_server.utils.DivideStream import DivideStream
 from openapi_server.utils.GenRandom import GenRandom
 from openapi_server.utils.CryptUtil import CryptUtil
 from openapi_server.utils.FileUtil import FileUtil
+from openapi_server.utils.FileUploaderOnChain import FileUploaderOnChain
 from pprint import pprint
 from distutils.util import strtobool
 import hashlib
@@ -186,60 +187,14 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
 
             # 7. save No.5 string in server
 
-
-            # 危険な文字を削除（サニタイズ処理）
-            #filename = secure_filename(req_file.filename)
-
-            # privatekey_wif = request.form["privatekey_wif"]
-            # uploader = polyglot.Upload(privatekey_wif, 'test')
-            # app.app.logger.info(uploader.network)
-            # req_file_bytearray = bytearray(stream.read())
-            # #app.app.logger.info(len(req_file_bytearray))
-            # #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
-            # media_type = uploader.get_media_type_for_file_name(filename)  ## WARNING: .jpeg is Error!!!!!
-            # app.app.logger.info(media_type)
-            # encoding = uploader.get_encoding_for_file_name(filename)
-            # app.app.logger.info(encoding)
-            # #print(media_type)
-            # #print(encoding)
-            # rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, filename)
-            # app.app.logger.info(rawtx)
-            # txid = uploader.send_rawtx(rawtx)
-            # #transaction = uploader.upload_b(filepath)
-            # #['5cd293a25ecf0b346ede712ceb716f35f1f78e2c5245852eb8319e353780c615']
-            # app.app.logger.info(txid)
-            ### encrypt_str = encrypt_str.decode('utf-8') #it's error
-            #aaa = bytes(encrypt_str_hex, 'utf-8')
-            
-            # #it's decrypt process.
-            # encrypt_str_bytes = bytes.fromhex(encrypt_str_hex)
-            # decrypt_str_bytes = cryptUtil.decrypt(secret_key, encrypt_str_bytes)
-            # decrypt_str = decrypt_str_bytes.decode('utf-8')
-
             # 7. calculate file hash and write hash on BlockChain.
             #calculate file hash
             hash = hashlib.new('ripemd160')
             hash.update(bytearray(stream))
             ripemd160_hash = hash.hexdigest()
 
-            encoding = "utf-8"
-            message_bytes = ripemd160_hash.encode(encoding)
-            message_bytes_length = len(message_bytes)
-            print(message_bytes_length)
-            if(message_bytes_length >= MAX_BSV_SIZE_BYTES):   #more less 100kb = 100000bytes.
-                return ResponseUploadToCloudModel(code=400, file_id="").to_dict(), 400
-
-            req_bytearray = bytearray(message_bytes)
-            #transaction = uploader.bcat_parts_send_from_binary(req_file_bytearray)
-            media_type = "text/plain"
-            print(media_type)
-            print(encoding)
             file_name = f"{file_id}_ripemd160_hash"
-            #upload data
-            uploader = polyglot.Upload(privatekey_wif, network=BSV_INFO_NETWORK)
-            print(uploader.filter_utxos_for_bcat())
-            rawtx = uploader.b_create_rawtx_from_binary(req_bytearray, media_type, encoding, file_name)
-            hash_txid = uploader.send_rawtx(rawtx)
+            hash_txid = FileUploaderOnChain.upload_text_file(file_name=file_name, message=ripemd160_hash, privatekey_wif=privatekey_wif, network=BSV_INFO_NETWORK)
             tx_id_list.append(hash_txid)
             return ResponseUploadToCloudModel(code=0, file_id=file_id, encrypt_hex=encrypt_str_hex, tx_id_list=tx_id_list).to_dict(), 200
         else:
