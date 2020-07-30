@@ -91,7 +91,7 @@ sudo docker run -p 8080:8080 bnoteapi:1.0
 
 ```
 
-## deploy heroku - it's work
+## deploy heroku
 
 ```
 sudo heroku container:login
