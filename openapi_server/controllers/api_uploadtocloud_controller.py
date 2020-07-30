@@ -27,6 +27,7 @@ from openapi_server.utils.FileUploaderOnChain import FileUploaderOnChain
 from pprint import pprint
 from distutils.util import strtobool
 import hashlib
+import time
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -105,6 +106,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
 
             dt_now = datetime.datetime.now()
             blob_service_client = None
+
+            fileUploaderOnChain = FileUploaderOnChain(privatekey_wif, BSV_INFO_NETWORK)
             if not on_chain:
                 azUploader = AzureUploader(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
                 azUploader.make_container_retry()
@@ -121,13 +124,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
 
                 if on_chain:
                     ## 6-1. on blockchain
-                    uploader = polyglot.Upload(wif=privatekey_wif, network=BSV_INFO_NETWORK)
-                    req_file_bytearray = bytearray(dividedStreamList[i])
-                    app.app.logger.info(len(req_file_bytearray))
-                    media_type = uploader.get_media_type_for_file_name(file_name)  ## WARNING: .jpeg is Error!!!!!
-                    encoding = uploader.get_encoding_for_file_name(file_name)
-                    rawtx = uploader.b_create_rawtx_from_binary(req_file_bytearray, media_type, encoding, file_name)
-                    tx_id = uploader.send_rawtx(rawtx)  ##TODO: retry or wait. リクエストが早すぎて失敗することがあるので
+                    file_bytearray = bytearray(dividedStreamList[i])
+                    tx_id = fileUploaderOnChain.upload_file_bytearray(file_name, file_bytearray)
                     tx_id_list.append(tx_id)
                 else:
                     ## 6-2. on cloud
@@ -141,6 +139,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
 
                 index += 1
 
+            app.app.logger.info("5. encrypt generate random index array to string")
             # 5. encrypt generate random index array to string
             maped_random_index_list = map(str, random_index_list)  #mapで要素すべてを文字列に
             random_index_str = ','.join(maped_random_index_list)
@@ -155,8 +154,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             ripemd160_hash = hash.hexdigest()
 
             file_name = f"{file_id}_ripemd160_hash"
-            fileUploaderOnChain = FileUploaderOnChain()
-            hash_txid = fileUploaderOnChain.upload_text_file(file_name=file_name, message=ripemd160_hash, privatekey_wif=privatekey_wif, network=BSV_INFO_NETWORK)
+            
+            hash_txid = fileUploaderOnChain.upload_text_file(file_name=file_name, message=ripemd160_hash)
             tx_id_list.append(hash_txid)
             return ResponseUploadToCloudModel(code=0, file_id=file_id, encrypt_hex=encrypt_str_hex, tx_id_list=tx_id_list).to_dict(), 200
         else:
