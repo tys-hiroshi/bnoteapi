@@ -26,6 +26,8 @@ CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={}
 UPLOAD_CONTAINER_NAME = config['API_CONFIG']['AZURE_INFO']['UPLOAD_CONTAINER_NAME']
 
 def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None):  # noqa: E501
+    # if connexion.request.is_json:
+    #     body = RequestMnemonicModel.from_dict(connexion.request.get_json())  # noqa: E501
     container = ContainerClient.from_connection_string(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
     # file_id = request.form["file_id"] ## 多分引数ではだめだったと。
     # secret_key_hex = request.form["secret_key_hex"]

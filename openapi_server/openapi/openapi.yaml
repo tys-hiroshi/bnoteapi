@@ -80,34 +80,14 @@ paths:
       x-codegen-request-body-name: body
       x-openapi-router-controller: openapi_server.controllers.api_download_controller
   /api/downloadfromcloud:
-    get:
+    post:
       description: downloadfromcloud
       operationId: api_downloadfromcloud
-      parameters:
-        - description: file_id
-          explode: true
-          in: query
-          name: file_id
-          required: true
-          schema:
-            type: string
-          style: form
-        - description: secret_key_hex
-          explode: true
-          in: query
-          name: secret_key_hex
-          required: true
-          schema:
-            type: string
-          style: form
-        - description: encrypt_hex
-          explode: true
-          in: query
-          name: encrypt_hex
-          required: true
-          schema:
-            type: string
-          style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestDownloadFromCloudModel'
       responses:
         "200":
           content:
@@ -428,6 +408,29 @@ components:
       properties:
         mnemonic:
           type: string
+      title: request /api/mnemonic
+      type: object
+    RequestDownloadFromCloudModel:
+      description: request /api/downloadfromcloud
+      example:
+        file_id: "20200729224416_a08f746009a64784b591b423a2c599b5"
+        secret_key_hex: "secret_key_hex"
+        encrypt_hex: "0436dd6bc2791f768383494346be916402fd8f4206ceb4b869c8b20841865578c412c3713c2db67f4639967b4a50a94f15acb88baae1fa2a2c5bf3093cd38089c47d077c78177a7ba2d6f0dcaceab0970505c8a323c7005ff41b2dcbc3320254c007f602"
+        on_chain: true
+        tx_id_list: ["txid01", "txid02"]
+      properties:
+        file_id:
+          type: string
+        secret_key_hex: 
+          type: string
+        encrypt_hex:
+          type: string
+        on_chain: 
+          type: string
+        tx_id_list:
+          type: array
+          items:
+            type: string
       title: request /api/mnemonic
       type: object
     ResponseMnemonicModel:
