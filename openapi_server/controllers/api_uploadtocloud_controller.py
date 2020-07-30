@@ -80,7 +80,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
         app.app.logger.info(req_file.filename)
         # ファイル名がなかった時の処理
         if req_file.filename == '':
-            return {}, 400
+            return ResponseUploadToCloudModel(code=400, file_id="").to_dict(), 400
         # ファイルのチェック
         if req_file and allwed_file(req_file.filename):
             fileUtil = FileUtil()
