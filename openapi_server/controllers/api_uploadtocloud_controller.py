@@ -194,7 +194,8 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
             ripemd160_hash = hash.hexdigest()
 
             file_name = f"{file_id}_ripemd160_hash"
-            hash_txid = FileUploaderOnChain.upload_text_file(file_name=file_name, message=ripemd160_hash, privatekey_wif=privatekey_wif, network=BSV_INFO_NETWORK)
+            fileUploaderOnChain = FileUploaderOnChain()
+            hash_txid = fileUploaderOnChain.upload_text_file(file_name=file_name, message=ripemd160_hash, privatekey_wif=privatekey_wif, network=BSV_INFO_NETWORK)
             tx_id_list.append(hash_txid)
             return ResponseUploadToCloudModel(code=0, file_id=file_id, encrypt_hex=encrypt_str_hex, tx_id_list=tx_id_list).to_dict(), 200
         else:

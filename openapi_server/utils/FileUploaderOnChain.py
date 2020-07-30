@@ -1,13 +1,11 @@
 import polyglot
 
 class FileUploaderOnChain:
-    MAX_BSV_SIZE_BYTES = 100000
-    ENCODING = "utf-8"
 
     def __init__(self):
-        pass
+        self.MAX_BSV_SIZE_BYTES = 100000
+        self.ENCODING = "utf-8"
 
-    @staticmethod
     def upload_text_file(self, file_name: str, message: str, privatekey_wif: str, network: str = '') -> str:
         message_bytes = message.encode(self.ENCODING)
         message_bytes_length = len(message_bytes)
