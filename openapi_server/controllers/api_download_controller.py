@@ -25,7 +25,6 @@ def api_download(txid):  # noqa: E501
 
     :rtype: file
     """
-    # return 'do some magic!'
     url = "https://api.whatsonchain.com/v1/bsv/test/tx/hash/" + txid
     headers = {"content-type": "application/json"}
     r = requests.get(url, headers=headers)

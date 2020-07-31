@@ -5,7 +5,7 @@ class FileUploaderOnChain:
     def __init__(self, privatekey_wif: str, network: str = ''):
         self.MAX_BSV_SIZE_BYTES = 100000
         self.TEXT_ENCODING = "utf-8"
-        self.MAX_RETRY_COUNT = 100000
+        self.MAX_RETRY_COUNT = 5
         self.privatekey_wif = privatekey_wif
         self.network = network
 
