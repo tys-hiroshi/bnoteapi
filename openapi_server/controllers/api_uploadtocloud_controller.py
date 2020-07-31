@@ -86,7 +86,7 @@ def api_uploadtocloud(file=None, privatekey_wif = None, public_key_hex=None, on_
         if req_file and allwed_file(req_file.filename):
             fileUtil = FileUtil()
             filename = fileUtil.convert_filename_jpeg_to_jpg(req_file.filename)
-            file_extention = fileUtil.get_file_extention(filename)
+            file_extention = fileUtil.get_file_extension(filename)
             # 1. divid upload file
             # 2. get divid file array
             divideStream = DivideStream()

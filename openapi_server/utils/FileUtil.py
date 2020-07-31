@@ -19,8 +19,11 @@ class FileUtil:
             'mp3': 'audio/mp3',
         }
 
-    def get_file_extention(self, filename):
-        return filename.rsplit('.', 1)[1].lower()
+    def get_file_extension(self, file_name):
+        if "." in file_name:
+            return file_name.rsplit('.', 1)[1].lower()
+        else:
+            return ""
 
     def convert_filename_jpeg_to_jpg(self, filename):
         basename_without_ext = filename.split('.')[0]

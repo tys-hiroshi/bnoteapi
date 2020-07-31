@@ -16,6 +16,7 @@ from openapi_server.utils.DivideStream import DivideStream
 import io
 from openapi_server.utils.CryptUtil import CryptUtil
 from openapi_server.utils.FileUtil import FileUtil
+from openapi_server.utils.FileDownloaderOnChain import FileDownloaderOnChain
 
 from io import BytesIO
 from distutils.util import strtobool
@@ -26,6 +27,7 @@ ACCOUNT_NAME = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_NAME']
 ACCOUNT_KEY = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_KEY']
 CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(ACCOUNT_NAME, ACCOUNT_KEY)
 UPLOAD_CONTAINER_NAME = config['API_CONFIG']['AZURE_INFO']['UPLOAD_CONTAINER_NAME']
+BSV_INFO_NETWORK = config['API_CONFIG']['BSV_INFO']['NETWORK']
 
 def api_downloadfromcloud():  # noqa: E501
     if connexion.request.is_json:
@@ -39,29 +41,43 @@ def api_downloadfromcloud():  # noqa: E501
     decrypt_str = decrypt_str_bytes.decode('utf-8')
     random_index_list = decrypt_str.split(',')
 
+    file_hash = None
+    file_extension = ""
+    random_stream_list = []
+    fileUtil = FileUtil()
     on_chain = strtobool(body.on_chain)
-    if not on_chain:  ## TODO: add case of blockchain
+    fileDownloaderOnChain = FileDownloaderOnChain(BSV_INFO_NETWORK)
+    if on_chain:  ## TODO: add case of blockchain
+        for idx in range(len(body.tx_id_list)):
+            responseDownloadFile = fileDownloaderOnChain.download_file(body.tx_id_list[idx])
+            if idx != len(body.tx_id_list) - 1:
+                random_stream_list.append(responseDownloadFile.data)
+                if idx == 0:
+                    file_extension = responseDownloadFile.file_extension
+    else:
         container = ContainerClient.from_connection_string(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
 
         blob_list = container.list_blobs(body.file_id)
-        random_stream_list = []
-        stream_list = []
-        file_extension = ""
-        fileUtil = FileUtil()
         for blob in blob_list:
             filename = fileUtil.convert_filename_jpeg_to_jpg(blob.name)
-            file_extension = fileUtil.get_file_extention(filename)
+            file_extension = fileUtil.get_file_extension(filename)
 
             blob = BlobClient.from_connection_string(
                 CONNECTION_STRING, UPLOAD_CONTAINER_NAME, blob.name)
 
             blob_data = blob.download_blob().readall() # StorageStreamDownloader
             random_stream_list.append(blob_data)
+    
+    ## NOTE: get file hash (Ripemd160)
+    file_hash_idx = len(body.tx_id_list) - 1
+    responseDownloadFile = fileDownloaderOnChain.download_file(body.tx_id_list[file_hash_idx])
+    file_hash = responseDownloadFile.data
 
     sort_list = []
     for idx, val in enumerate(random_index_list):
         sort_list.append(dict(idx= idx, val=val))
 
+    stream_list = []
     sorted_list = sorted(sort_list, key=lambda x:x['val'])
     for item  in sorted_list:
         stream_list.append(random_stream_list[item["idx"]])
@@ -93,6 +109,7 @@ def api_downloadfromcloud():  # noqa: E501
     response = app.app.make_response(joined_stream_to_bytes)
     response.data = joined_stream_to_bytes
     response.headers["Content-Disposition"] = header_ContentDisposition
+    response.headers["File-Hash-Ripemd160"] = file_hash
     response.mimetype = mimetype
 
 
