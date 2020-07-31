@@ -18,6 +18,7 @@ from openapi_server.utils.CryptUtil import CryptUtil
 from openapi_server.utils.FileUtil import FileUtil
 
 from io import BytesIO
+from distutils.util import strtobool
 
 configFile = "app_config.yml"
 config = Config(configFile).content
@@ -29,11 +30,7 @@ UPLOAD_CONTAINER_NAME = config['API_CONFIG']['AZURE_INFO']['UPLOAD_CONTAINER_NAM
 def api_downloadfromcloud():  # noqa: E501
     if connexion.request.is_json:
         body = RequestDownloadFromCloudModel.from_dict(connexion.request.get_json())  # noqa: E501
-    container = ContainerClient.from_connection_string(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
-    # file_id = request.form["file_id"] ## 多分引数ではだめだったと。
-    # secret_key_hex = request.form["secret_key_hex"]
-    # encrypt_hex = request.form["encrypt_hex"]
-    
+
     #it's decrypt process.
     cryptUtil = CryptUtil()
 
@@ -42,20 +39,24 @@ def api_downloadfromcloud():  # noqa: E501
     decrypt_str = decrypt_str_bytes.decode('utf-8')
     random_index_list = decrypt_str.split(',')
 
-    blob_list = container.list_blobs(body.file_id)
-    random_stream_list = []
-    stream_list = []
-    file_extension = ""
-    fileUtil = FileUtil()
-    for blob in blob_list:
-        filename = fileUtil.convert_filename_jpeg_to_jpg(blob.name)
-        file_extension = fileUtil.get_file_extention(filename)
+    on_chain = strtobool(body.on_chain)
+    if not on_chain:  ## TODO: add case of blockchain
+        container = ContainerClient.from_connection_string(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
 
-        blob = BlobClient.from_connection_string(
-            CONNECTION_STRING, UPLOAD_CONTAINER_NAME, blob.name)
+        blob_list = container.list_blobs(body.file_id)
+        random_stream_list = []
+        stream_list = []
+        file_extension = ""
+        fileUtil = FileUtil()
+        for blob in blob_list:
+            filename = fileUtil.convert_filename_jpeg_to_jpg(blob.name)
+            file_extension = fileUtil.get_file_extention(filename)
 
-        blob_data = blob.download_blob().readall() # StorageStreamDownloader
-        random_stream_list.append(blob_data)
+            blob = BlobClient.from_connection_string(
+                CONNECTION_STRING, UPLOAD_CONTAINER_NAME, blob.name)
+
+            blob_data = blob.download_blob().readall() # StorageStreamDownloader
+            random_stream_list.append(blob_data)
 
     sort_list = []
     for idx, val in enumerate(random_index_list):
