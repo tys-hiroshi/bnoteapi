@@ -1,6 +1,7 @@
 import connexion
 import six
-  # noqa: E501
+from openapi_server.models.request_download_from_cloud_model import RequestDownloadFromCloudModel  # noqa: E501
+
 from openapi_server import util
 from flask import request
 
@@ -25,9 +26,9 @@ ACCOUNT_KEY = config['API_CONFIG']['AZURE_INFO']['ACCOUNT_KEY']
 CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName={};AccountKey={};EndpointSuffix=core.windows.net".format(ACCOUNT_NAME, ACCOUNT_KEY)
 UPLOAD_CONTAINER_NAME = config['API_CONFIG']['AZURE_INFO']['UPLOAD_CONTAINER_NAME']
 
-def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None):  # noqa: E501
-    # if connexion.request.is_json:
-    #     body = RequestMnemonicModel.from_dict(connexion.request.get_json())  # noqa: E501
+def api_downloadfromcloud():  # noqa: E501
+    if connexion.request.is_json:
+        body = RequestDownloadFromCloudModel.from_dict(connexion.request.get_json())  # noqa: E501
     container = ContainerClient.from_connection_string(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
     # file_id = request.form["file_id"] ## 多分引数ではだめだったと。
     # secret_key_hex = request.form["secret_key_hex"]
@@ -36,12 +37,12 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     #it's decrypt process.
     cryptUtil = CryptUtil()
 
-    encrypt_str_bytes = bytes.fromhex(encrypt_hex)
-    decrypt_str_bytes = cryptUtil.decrypt(secret_key_hex, encrypt_str_bytes)
+    encrypt_str_bytes = bytes.fromhex(body.encrypt_hex)
+    decrypt_str_bytes = cryptUtil.decrypt(body.secret_key_hex, encrypt_str_bytes)
     decrypt_str = decrypt_str_bytes.decode('utf-8')
     random_index_list = decrypt_str.split(',')
 
-    blob_list = container.list_blobs(file_id)
+    blob_list = container.list_blobs(body.file_id)
     random_stream_list = []
     stream_list = []
     file_extension = ""
@@ -49,8 +50,7 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     for blob in blob_list:
         filename = fileUtil.convert_filename_jpeg_to_jpg(blob.name)
         file_extension = fileUtil.get_file_extention(filename)
-        
-        print(blob.name + '\n')
+
         blob = BlobClient.from_connection_string(
             CONNECTION_STRING, UPLOAD_CONTAINER_NAME, blob.name)
 
@@ -85,7 +85,7 @@ def api_downloadfromcloud(file_id=None, secret_key_hex=None, encrypt_hex=None): 
     # or 
     joined_stream_to_bytes = bs.getvalue()
     
-    downloadFilename = "{}.{}".format(file_id, file_extension)
+    downloadFilename = "{}.{}".format(body.file_id, file_extension)
     # #headers["Content-Disposition"] = 'attachment; filename=' + downloadFilename
     header_ContentDisposition = 'attachment; filename=' + downloadFilename
     mimetype = fileUtil.get_media_type_for_extension(file_extension)

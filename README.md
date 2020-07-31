@@ -80,8 +80,6 @@ sudo npm install -g openapi-to-postmanv2
 openapi2postmanv2 -s openapi_server/openapi/openapi.yaml -o postman_collection.json -p
 ```
 
-
-
 ## run local
 
 ```
@@ -111,4 +109,17 @@ remove app
 
 ```
 sudo heroku apps:destroy --app [app name] --confirm [app name]
+```
+
+## OpenApi-Generator
+
+```
+git clone https://github.com/openapitools/openapi-generator
+cd openapi-generator
+mvn clean package
+
+java -jar modules/openapi-generator-cli/target/openapi-generator-cli.jar generate \
+   -i https://raw.githubusercontent.com/tys-hiroshi/bnoteapi/develop/openapi_server/openapi/openapi.yaml \
+   -g python-flask \
+   -o output/bnoteapi
 ```
