@@ -19,9 +19,9 @@ class FileUtil:
             'mp3': 'audio/mp3',
         }
 
-    def get_file_extension(self, file_name):
-        if "." in file_name:
-            return file_name.rsplit('.', 1)[1].lower()
+    def get_file_extention(self, filename):
+        if "." in filename:
+            return filename.rsplit('.', 1)[1].lower()
         else:
             return ""
 
@@ -39,3 +39,5 @@ class FileUtil:
 
     def get_media_type_for_extension(self, ext):
         return self.MEDIA_TYPE[str(ext)]
+
+    ## TODO: media_type to extension

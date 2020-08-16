@@ -41,43 +41,41 @@ def api_downloadfromcloud():  # noqa: E501
     decrypt_str = decrypt_str_bytes.decode('utf-8')
     random_index_list = decrypt_str.split(',')
 
-    file_hash = None
-    file_extension = ""
     random_stream_list = []
+    stream_list = []
+    file_hash_data = None
+    file_extension = ""
     fileUtil = FileUtil()
     on_chain = strtobool(body.on_chain)
-    fileDownloaderOnChain = FileDownloaderOnChain(BSV_INFO_NETWORK)
     if on_chain:  ## TODO: add case of blockchain
-        for idx in range(len(body.tx_id_list)):
+        fileDownloaderOnChain = FileDownloaderOnChain(BSV_INFO_NETWORK)
+        for idx in range(len(body.tx_id_list)):  ##NOTE: jsonのarray は順序保証されるので一番最後はFileのHash値なので別で処理
             responseDownloadFile = fileDownloaderOnChain.download_file(body.tx_id_list[idx])
-            if idx != len(body.tx_id_list) - 1:
+            if idx == len(body.tx_id_list) - 1:  ##NOTE: FileのHash値
+                file_hash_data = responseDownloadFile.data
+            else:
                 random_stream_list.append(responseDownloadFile.data)
                 if idx == 0:
                     file_extension = responseDownloadFile.file_extension
+
     else:
         container = ContainerClient.from_connection_string(CONNECTION_STRING, UPLOAD_CONTAINER_NAME)
 
         blob_list = container.list_blobs(body.file_id)
         for blob in blob_list:
             filename = fileUtil.convert_filename_jpeg_to_jpg(blob.name)
-            file_extension = fileUtil.get_file_extension(filename)
+            file_extension = fileUtil.get_file_extention(filename)
 
             blob = BlobClient.from_connection_string(
                 CONNECTION_STRING, UPLOAD_CONTAINER_NAME, blob.name)
 
             blob_data = blob.download_blob().readall() # StorageStreamDownloader
             random_stream_list.append(blob_data)
-    
-    ## NOTE: get file hash (Ripemd160)
-    file_hash_idx = len(body.tx_id_list) - 1
-    responseDownloadFile = fileDownloaderOnChain.download_file(body.tx_id_list[file_hash_idx])
-    file_hash = responseDownloadFile.data
 
     sort_list = []
     for idx, val in enumerate(random_index_list):
         sort_list.append(dict(idx= idx, val=val))
 
-    stream_list = []
     sorted_list = sorted(sort_list, key=lambda x:x['val'])
     for item  in sorted_list:
         stream_list.append(random_stream_list[item["idx"]])
@@ -102,15 +100,13 @@ def api_downloadfromcloud():  # noqa: E501
     # or 
     joined_stream_to_bytes = bs.getvalue()
     
-    downloadFilename = "{}.{}".format(body.file_id, file_extension)
-    # #headers["Content-Disposition"] = 'attachment; filename=' + downloadFilename
+    downloadFilename = f"{body.file_id}.{file_extension}"
     header_ContentDisposition = 'attachment; filename=' + downloadFilename
     mimetype = fileUtil.get_media_type_for_extension(file_extension)
     response = app.app.make_response(joined_stream_to_bytes)
     response.data = joined_stream_to_bytes
     response.headers["Content-Disposition"] = header_ContentDisposition
-    response.headers["File-Hash-Ripemd160"] = file_hash
     response.mimetype = mimetype
-
+    response.headers["File-Hash-Ripemd160"] = file_hash_data
 
     return response, 200
