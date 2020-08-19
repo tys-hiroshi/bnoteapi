@@ -51,7 +51,9 @@ def api_tx(addr, start_index=None, count=None):  # noqa: E501
         if len(trans_list) > 0:
             print(trans_list)
             p = multiprocessing.Pool(6) # プロセス数を6に設定
-            result = p.map(WhatsOnChainLib.get_textdata, trans_list)  ## arg must be array
+            network = "test"
+            whatsOnChainLib = WhatsOnChainLib(network)
+            result = p.map(whatsOnChainLib.get_textdata, trans_list)  ## arg must be array
 
             for item in result:
                 if item is not None and item.mimetype == "text/plain":
