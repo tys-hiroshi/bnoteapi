@@ -11,7 +11,7 @@ click==7.1.1
 clickclick==1.2.2
 coincurve==13.0.0
 connexion==2.6.0
-cryptography==2.9.2
+cryptography==3.2
 cytoolz==0.10.1
 dnspython==1.16.0
 dominate==2.5.1
